@@ -34,6 +34,7 @@ Whether you are a server owner looking to enhance your Roleplay, or a developer 
 
 ## 📂 Nossos Projetos / Our Projects
 * 🚀 **[voar](./voar/)** - Sistema Avançado de Voo Livre (NoClip) com opção de "Sequestro" e telecinese de NPCs/Jogadores. (Advanced Free Flight System with NPC interaction).
+  * 🎞️ **[Assista ao Tutorial de Funcionamento no YouTube](https://www.youtube.com/watch?v=3s63nawpKtY)**
 
 <br>
 

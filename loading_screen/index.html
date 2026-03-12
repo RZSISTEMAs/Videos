@@ -9,7 +9,10 @@
 </head>
 <body>
     <div id="video-background">
-        <div id="youtube-player"></div>
+        <video id="background-video" autoplay muted loop>
+            <source src="intro.mp4" type="video/mp4">
+            Seu navegador não suporta vídeos HTML5.
+        </video>
     </div>
     
     <div id="overlay"></div>
@@ -27,8 +30,6 @@
         </div>
     </div>
 
-    <!-- YouTube IFrame API -->
-    <script src="https://www.youtube.com/iframe_api"></script>
     <script src="script.js"></script>
 </body>
 </html>

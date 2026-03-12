@@ -1,29 +1,3 @@
-var player;
-function onYouTubeIframeAPIReady() {
-    player = new YT.Player('youtube-player', {
-        height: '100%',
-        width: '100%',
-        videoId: 'lVhJ_A8XUgc',
-        playerVars: {
-            'autoplay': 1,
-            'controls': 0,
-            'showinfo': 0,
-            'rel': 0,
-            'loop': 1,
-            'playlist': 'lVhJ_A8XUgc', // Necessário para looping
-            'mute': 0 // Se quiser música, deixe mudo como 0, mas atente para políticas de autoplay do browser
-        },
-        events: {
-            'onReady': onPlayerReady
-        }
-    });
-}
-
-function onPlayerReady(event) {
-    event.target.playVideo();
-    event.target.setVolume(50); // Volume em 50%
-}
-
 // FiveM Loading Events
 window.addEventListener('message', function(event) {
     var data = event.data;
@@ -35,7 +9,6 @@ window.addEventListener('message', function(event) {
     }
 });
 
-// Outro evento comum para log de linhas, caso precise
 var count = 0;
 var thisCount = 0;
 
@@ -65,3 +38,15 @@ window.addEventListener('message', function(event) {
         handlers[event.data.eventName](event.data);
     }
 });
+
+// Forçar volume do vídeo se necessário ( FiveM browser pode bloquear som sem interação)
+window.onload = function() {
+    var video = document.getElementById('background-video');
+    if (video) {
+        video.volume = 0.5;
+        // Tentativa de dar play se o autoplay falhar
+        video.play().catch(function(error) {
+            console.log("Autoplay bloqueado, aguardando carregamento.");
+        });
+    }
+};

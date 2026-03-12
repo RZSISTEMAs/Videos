@@ -1,7 +1,7 @@
 fx_version 'cerulean'
 game 'gta5'
 
-author 'Antigravity'
+author 'RZSISTEMA'
 description 'Custom Loading Screen for RZSISTEMAs'
 version '1.0.0'
 

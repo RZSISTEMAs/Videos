@@ -54,11 +54,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
             console.log("Autoplay bloqueado pelo browser.");
         });
         
-        // Se quiser som, tente desmutar após 1 segundo (alguns sistemas permitem após carregamento)
+        // Se quiser som, tente desmutar após 2 segundos (alguns sistemas permitem após carregamento)
         setTimeout(() => {
             video.muted = false;
             video.volume = 0.5;
-        }, 1000);
+            console.log("Tentativa de liberar áudio...");
+        }, 2000);
     }
 });
 

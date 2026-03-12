@@ -122,20 +122,78 @@ function DropCrate(coords)
                 DeleteObject(parachute)
                 
                 -- Efeito de Sinalizador (Flare)
+                local ptfxAsset = "core"
+                RequestNamedPtfxAsset(ptfxAsset)
+                while not HasNamedPtfxAssetLoaded(ptfxAsset) do
+                    Wait(0)
+                end
+                UseParticleFxAssetNextCall(ptfxAsset)
                 flare = StartParticleFxLoopedAtCoord("exp_grd_flare", cCoords.x, cCoords.y, cCoords.z, 0.0, 0.0, 0.0, 2.0, false, false, false, false)
+                SetParticleFxLoopedColour(flare, 1.0, 0.0, 0.0, 0) -- Fumaça Vermelha
                 
                 -- Spawnar Guardas
                 SpawnGuards(cCoords)
                 
                 TriggerEvent('chat:addMessage', { args = { '^1[AIRDROP]', '^7A carga pousou! Cuidado com os mercenários.' } })
+
+                -- Iniciar Lógica de Abertura
+                LootCrateLogic()
                 break
             end
         end
     end)
 end
 
+function LootCrateLogic()
+    CreateThread(function()
+        local looting = false
+        while DoesEntityExist(crate) do
+            Wait(0)
+            local pPed = PlayerPedId()
+            local pPos = GetEntityCoords(pPed)
+            local cPos = GetEntityCoords(crate)
+            local dist = #(pPos - cPos)
+
+            if dist < 3.0 and not looting then
+                -- Desenhar instrução na tela
+                SetTextComponentFormat("STRING")
+                AddTextComponentString("Pressione ~INPUT_CONTEXT~ para abrir a Caixa")
+                DisplayHelpTextFromStringLabel(0, 0, 1, -1)
+
+                if IsControlJustPressed(0, 38) then -- E
+                    looting = true
+                    TaskStartScenarioInPlace(pPed, "PROP_HUMAN_BUM_BIN", 0, true)
+                    
+                    -- Progresso de abertura
+                    exports['progressBars']:startUI(5000, "ABRINDO CAIXA...") -- Caso use progressBars, senão apenas o Wait
+                    Wait(5000)
+                    
+                    ClearPedTasksImmediately(pPed)
+                    
+                    -- Recompensas
+                    GiveWeaponToPed(pPed, `WEAPON_SPECIALCARBINE`, 100, false, true)
+                    GiveWeaponToPed(pPed, `WEAPON_COMBATPISTOL`, 50, false, true)
+                    SetPedArmour(pPed, 100)
+                    
+                    TriggerEvent('chat:addMessage', { args = { '^1[AIRDROP]', '^2Você saqueou a carga com sucesso!' } })
+                    
+                    -- Limpeza
+                    StopParticleFxLooped(flare, 0)
+                    DeleteObject(crate)
+                    for _, guard in ipairs(guards) do
+                        if DoesEntityExist(guard) then
+                            SetEntityAsNoLongerNeeded(guard)
+                        end
+                    end
+                    break
+                end
+            end
+        end
+    end)
+end
+
 function SpawnGuards(coords)
-    local group = AddRelationshipGroup("AIRDROP_GUARDS")
+    local _, group = AddRelationshipGroup("AIRDROP_GUARDS") -- Em Lua o hash vem no segundo retorno
     
     for i=1, 3 do
         local angle = i * 120
@@ -146,7 +204,9 @@ function SpawnGuards(coords)
         SetPedRelationshipGroupHash(guard, group)
         GiveWeaponToPed(guard, `WEAPON_CARBINERIFLE`, 250, false, true)
         SetPedArmour(guard, 100)
-        SetPedCombatAttributes(guard, 46, true) -- Luta até o fim
+        SetPedCombatAttributes(guard, 46, true)
+        SetPedCombatAttributes(guard, 5, true) -- Luta agressiva
+        SetPedCombatMovement(guard, 2) -- Avança
         
         TaskGuardCurrentPosition(guard, 15.0, 10.0, 1)
         table.insert(guards, guard)

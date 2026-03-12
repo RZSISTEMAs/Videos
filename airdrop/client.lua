@@ -144,6 +144,23 @@ function DropCrate(coords)
     end)
 end
 
+-- Função auxiliar para Texto 3D (Mais visível que o aviso no canto)
+function DrawText3D(x, y, z, text)
+    local onScreen, _x, _y = World3dToScreen2d(x, y, z)
+    if onScreen then
+        SetTextScale(0.35, 0.35)
+        SetTextFont(4)
+        SetTextProportional(1)
+        SetTextColour(255, 255, 255, 215)
+        SetTextEntry("STRING")
+        SetTextCentre(1)
+        AddTextComponentString(text)
+        DrawText(_x, _y)
+        local factor = (string.len(text)) / 370
+        DrawRect(_x, _y + 0.0125, 0.015 + factor, 0.03, 41, 11, 41, 68)
+    end
+end
+
 function LootCrateLogic()
     CreateThread(function()
         local looting = false
@@ -154,35 +171,53 @@ function LootCrateLogic()
             local cPos = GetEntityCoords(crate)
             local dist = #(pPos - cPos)
 
-            if dist < 3.0 and not looting then
-                -- Desenhar instrução na tela
-                SetTextComponentFormat("STRING")
-                AddTextComponentString("Pressione ~INPUT_CONTEXT~ para abrir a Caixa")
-                DisplayHelpTextFromStringLabel(0, 0, 1, -1)
+            if dist < 5.0 and not looting then
+                -- Desenhar Texto 3D flutuando sobre a caixa
+                DrawText3D(cPos.x, cPos.y, cPos.z + 0.5, "~g~[E]~w~ Abrir Caixa de Suprimentos")
 
-                if IsControlJustPressed(0, 38) then -- E
+                if IsControlJustPressed(0, 38) then -- Tecla E
                     looting = true
+                    
+                    -- Animação de agachar/mexer
                     TaskStartScenarioInPlace(pPed, "PROP_HUMAN_BUM_BIN", 0, true)
                     
-                    -- Progresso de abertura
-                    exports['progressBars']:startUI(5000, "ABRINDO CAIXA...") -- Caso use progressBars, senão apenas o Wait
-                    Wait(5000)
+                    -- Barra de progresso interna (caso não tenha o script progressBars)
+                    local timer = 5000
+                    while timer > 0 do
+                        Wait(0)
+                        timer = timer - 10
+                        DrawText3D(cPos.x, cPos.y, cPos.z + 0.7, "~y~Abrindo... ~w~" .. math.floor((5000 - timer) / 50) .. "%")
+                        if not DoesEntityExist(crate) then break end
+                    end
                     
                     ClearPedTasksImmediately(pPed)
                     
-                    -- Recompensas
-                    GiveWeaponToPed(pPed, `WEAPON_SPECIALCARBINE`, 100, false, true)
-                    GiveWeaponToPed(pPed, `WEAPON_COMBATPISTOL`, 50, false, true)
-                    SetPedArmour(pPed, 100)
-                    
-                    TriggerEvent('chat:addMessage', { args = { '^1[AIRDROP]', '^2Você saqueou a carga com sucesso!' } })
-                    
-                    -- Limpeza
-                    StopParticleFxLooped(flare, 0)
-                    DeleteObject(crate)
-                    for _, guard in ipairs(guards) do
-                        if DoesEntityExist(guard) then
-                            SetEntityAsNoLongerNeeded(guard)
+                    if DoesEntityExist(crate) then
+                        -- 1. RECOMPENSA: ARMA + 50 MUNIÇÃO
+                        local weaponHash = `WEAPON_SPECIALCARBINE`
+                        GiveWeaponToPed(pPed, weaponHash, 50, false, true)
+                        SetPedArmour(pPed, 100)
+
+                        -- 2. RECOMPENSA: MOTO ALEATÓRIA
+                        local bikes = {`sanchez`, `faggio`, `pcj`, `akuma`, `bf400`}
+                        local randomBike = bikes[math.random(#bikes)]
+                        
+                        RequestModel(randomBike)
+                        while not HasModelLoaded(randomBike) do Wait(0) end
+                        
+                        local bike = CreateVehicle(randomBike, cPos.x + 2.0, cPos.y + 2.0, cPos.z, GetEntityHeading(pPed), true, false)
+                        PlaceObjectOnGroundProperly(bike)
+                        SetEntityAsNoLongerNeeded(bike)
+
+                        TriggerEvent('chat:addMessage', { args = { '^1[AIRDROP]', '^2Você encontrou suprimentos e um veículo!' } })
+                        
+                        -- Limpeza Final
+                        if flare then StopParticleFxLooped(flare, 0) end
+                        DeleteObject(crate)
+                        for _, guard in ipairs(guards) do
+                            if DoesEntityExist(guard) then
+                                SetEntityAsNoLongerNeeded(guard)
+                            end
                         end
                     end
                     break

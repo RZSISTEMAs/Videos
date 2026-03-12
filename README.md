@@ -36,6 +36,7 @@ Whether you are a server owner looking to enhance your Roleplay, or a developer 
 * 🚀 **[voar](./voar/)** - Sistema Avançado de Voo Livre (NoClip) com opção de "Sequestro" e telecinese de NPCs/Jogadores. (Advanced Free Flight System with NPC interaction).
   * 🎞️ **[Assista ao Tutorial de Funcionamento no YouTube](https://www.youtube.com/watch?v=3s63nawpKtY)**
 * ⏳ **[loading_screen](./loading_screen/)** - Tela de carregamento premium com fundo de vídeo do YouTube, logo pulsante e barra de progresso em tempo real. (Premium loading screen with YouTube background and real-time progress).
+* 📦 **[airdrop](./airdrop/)** - Sistema de suprimentos caídos do céu com avião Titan, física de paraquedas e guardas NPCs protegendo a carga. (Advanced airdrop system with parachute physics and NPC guards).
 
 <br>
 

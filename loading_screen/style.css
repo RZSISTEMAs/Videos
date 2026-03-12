@@ -1,0 +1,128 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #000;
+    color: #fff;
+    font-family: 'Roboto', sans-serif;
+}
+
+#video-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    pointer-events: none;
+}
+
+#youtube-player {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 100vh;
+    transform: translate(-50%, -50%);
+}
+
+@media (min-aspect-ratio: 16/9) {
+    #youtube-player {
+        height: 56.25vw;
+    }
+}
+
+@media (max-aspect-ratio: 16/9) {
+    #youtube-player {
+        width: 177.78vh;
+    }
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%);
+    z-index: -1;
+}
+
+#loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+}
+
+#logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8rem;
+    font-weight: 700;
+    color: #ff8c00; /* Laranja premium */
+    text-shadow: 0 0 20px rgba(255, 140, 0, 0.8);
+    animation: pulse 2s infinite ease-in-out;
+    margin-bottom: 2rem;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+        text-shadow: 0 0 20px rgba(255, 140, 0, 0.8);
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+        text-shadow: 0 0 40px rgba(255, 140, 0, 1);
+    }
+}
+
+#radio-player {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 5rem;
+}
+
+#now-playing {
+    font-size: 1rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+}
+
+#progress-wrapper {
+    position: fixed;
+    bottom: 10%;
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#progress-bar {
+    width: 0%;
+    height: 4px;
+    background: linear-gradient(90deg, #ff8c00, #ff4500);
+    box-shadow: 0 0 10px rgba(255, 140, 0, 0.8);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+#progress-text {
+    margin-top: 1rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 3px;
+    color: rgba(255, 255, 255, 0.7);
+}

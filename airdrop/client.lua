@@ -116,8 +116,11 @@ function DropCrate(coords)
             -- Simular resistência do ar do paraquedas (reduz velocidade de queda)
             ApplyForceToEntity(crate, 3, 0.0, 0.0, 10.5, 0.0, 0.0, 0.0, 0, true, true, true, false, true)
 
-            -- Verificando pouso
-            if distGround < 2.0 or HasEntityCollidedWithBound(crate) then
+            -- Verificando pouso (Muito mais robusto)
+            local height = GetEntityHeightAboveGround(crate)
+            local velocity = GetEntityVelocity(crate)
+            
+            if height < 1.2 or math.abs(velocity.z) < 0.1 then
                 DetachEntity(parachute, true, true)
                 DeleteObject(parachute)
                 

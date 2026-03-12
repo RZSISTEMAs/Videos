@@ -4,32 +4,38 @@ window.addEventListener('message', function(event) {
 
     if (data.type === 'loadProgress') {
         var progress = Math.round(data.loadFraction * 100);
-        document.getElementById('progress-bar').style.width = progress + '%';
-        document.getElementById('progress-text').innerText = 'CARREGANDO: ' + progress + '%';
+        updateProgress(progress, 'CARREGANDO');
     }
 });
 
 var count = 0;
 var thisCount = 0;
+var lastEvent = "";
+
+function updateProgress(percentage, text) {
+    if (percentage > 100) percentage = 100;
+    document.getElementById('progress-bar').style.width = percentage + '%';
+    document.getElementById('progress-text').innerText = text + ': ' + percentage + '%';
+}
 
 const handlers = {
     startInitFunctionOrder(data) {
         count = data.count;
+        thisCount = 0;
+        lastEvent = "init";
     },
     initFunctionInvoked(data) {
         thisCount++;
-        var progress = Math.round((thisCount / count) * 100);
-        document.getElementById('progress-bar').style.width = progress + '%';
-        document.getElementById('progress-text').innerText = 'INICIALIZANDO: ' + progress + '%';
+        updateProgress(Math.round((thisCount / count) * 100), 'INICIALIZANDO');
     },
     startDataFileEntries(data) {
         count = data.count;
+        thisCount = 0;
+        lastEvent = "data";
     },
     performMapLoadFunction(data) {
         thisCount++;
-        var progress = Math.round((thisCount / count) * 100);
-        document.getElementById('progress-bar').style.width = progress + '%';
-        document.getElementById('progress-text').innerText = 'MAPA: ' + progress + '%';
+        updateProgress(Math.round((thisCount / count) * 100), 'MAPA');
     }
 };
 
@@ -39,14 +45,20 @@ window.addEventListener('message', function(event) {
     }
 });
 
-// Forçar volume do vídeo se necessário ( FiveM browser pode bloquear som sem interação)
-window.onload = function() {
+// Forçar reprodução do vídeo
+window.addEventListener('DOMContentLoaded', (event) => {
     var video = document.getElementById('background-video');
     if (video) {
-        video.volume = 0.5;
-        // Tentativa de dar play se o autoplay falhar
+        video.muted = true; // Essencial para autoplay funcionar sempre
         video.play().catch(function(error) {
-            console.log("Autoplay bloqueado, aguardando carregamento.");
+            console.log("Autoplay bloqueado pelo browser.");
         });
+        
+        // Se quiser som, tente desmutar após 1 segundo (alguns sistemas permitem após carregamento)
+        setTimeout(() => {
+            video.muted = false;
+            video.volume = 0.5;
+        }, 1000);
     }
-};
+});
+

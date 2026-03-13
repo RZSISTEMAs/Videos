@@ -39,6 +39,7 @@ Whether you are a server owner looking to enhance your Roleplay, or a developer 
   * 🎞️ **[Assista ao Tutorial de Funcionamento no YouTube](https://www.youtube.com/watch?v=d7uGsV8ykf8)**
 * 📦 **[airdrop](./airdrop/)** - Sistema de suprimentos caídos do céu com avião Titan, física de paraquedas e guardas NPCs protegendo a carga. (Advanced airdrop system with parachute physics and NPC guards).
   * 🎞️ **[Assista ao Tutorial de Funcionamento no YouTube](https://www.youtube.com/watch?v=NwqZOcAI6Lo)**
+* 🏙️ **[cidade_viva](./cidade_viva/)** - Sistema inovador de destruição persistente onde o mapa só é restaurado se os jogadores consertarem os objetos. (Innovative persistent destruction system).
 
 <br>
 

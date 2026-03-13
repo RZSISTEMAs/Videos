@@ -38,6 +38,7 @@ Whether you are a server owner looking to enhance your Roleplay, or a developer 
 * ⏳ **[loading_screen](./loading_screen/)** - Tela de carregamento premium com fundo de vídeo, logo pulsante e barra de progresso em tempo real. (Premium loading screen with video background and real-time progress).
   * 🎞️ **[Assista ao Tutorial de Funcionamento no YouTube](https://www.youtube.com/watch?v=d7uGsV8ykf8)**
 * 📦 **[airdrop](./airdrop/)** - Sistema de suprimentos caídos do céu com avião Titan, física de paraquedas e guardas NPCs protegendo a carga. (Advanced airdrop system with parachute physics and NPC guards).
+  * 🎞️ **[Assista ao Tutorial de Funcionamento no YouTube](https://www.youtube.com/watch?v=NwqZOcAI6Lo)**
 
 <br>
 

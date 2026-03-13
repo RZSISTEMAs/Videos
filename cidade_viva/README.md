@@ -1,12 +1,14 @@
 # 🏙️ Cidade Viva - Destruição Persistente (RZSISTEMA)
 
-Um script altamente inovador para FiveM que traz consequências reais ao mundo. Objetos destruídos (postes, hidrantes, sinalizações) permanecem quebrados para sempre até que um jogador os conserte.
+Um script altamente inovador para FiveM que traz consequências reais ao mundo. Focado exclusivamente em **postes de luz**, este sistema garante que se um poste for derrubado, ele permanecerá caído até que o reparo completo seja realizado.
 
 ## 🚀 Funcionalidades
-- **Persistência Sem Banco de Dados:** Utiliza arquivos JSON para salvar cada objeto destruído no mapa, mantendo o estado mesmo após o restart do servidor.
-- **Detecção Automática:** O script identifica dinamicamente quando um objeto do cenário é derrubado ou quebrado por colisões.
-- **Sistema de Zeladoria:** Jogadores podem utilizar o comando `/consertar` para restaurar o patrimônio público.
-- **Reconhecimento Social:** Quando um jogador conserta um item, uma notificação global exibe seu nome e sua boa ação para todo o servidor.
+- **Foco em Postes:** Detecção inteligente focada nos postes de luz da cidade.
+- **Persistência Sem Banco de Dados:** Salva o estado dos postes derrubados em arquivo JSON, mantendo a destruição mesmo após o restart.
+- **Sistema de Reparo em Duas Etapas (Inovação):**
+    1.  **Reparo de Estrutura:** O jogador usa `/consertar` para levantar o poste e colocá-lo no lugar.
+    2.  **Reparo de Fiação:** Após levantado, o poste precisa de fiação. O jogador usa `/fiacao` para restaurar a luz e o poste por completo.
+- **Notificações Globais:** Exibe o nome do cidadão zeloso para todo o servidor ao finalizar um reparo.
 
 ## 🛠️ Instalação
 1. Baixe a pasta `cidade_viva`.
@@ -15,28 +17,32 @@ Um script altamente inovador para FiveM que traz consequências reais ao mundo. 
 4. Reinicie o servidor.
 
 ## 🎮 Comandos
-- `/consertar` - Inicia o processo de reparo ao chegar perto de um objeto destruído.
+- `/consertar` - Levanta o poste derrubado (Primeira Etapa).
+- `/fiacao` - Realiza a fiação elétrica e finaliza o serviço (Segunda Etapa).
 
 ---
 
 # 🏙️ Living City - Persistent Destruction (RZSISTEMA)
 
-An innovative FiveM script that brings real consequences to the game world. Destroyed objects (lamp posts, hydrants, signs) stay broken forever until a player fixes them.
+An innovative FiveM script focusing on permanent consequences for light poles. If a pole is knocked down, it stays down until a full two-stage repair is completed.
 
 ## 🚀 Features
-- **Database-free Persistence:** Uses JSON files to save every destroyed object on the map, maintaining state even after server restarts.
-- **Auto Detection:** Dynamically identifies when scenery objects are knocked down or broken by collisions.
-- **Maintenance System:** Players can use the `/consertar` command to restore public property.
-- **Social Recognition:** When a player repairs an item, a global notification displays their name and good deed to the entire server.
+- **Pole-Focused:** Intelligent detection for street light poles.
+- **Database-free Persistence:** Saves the state of downed poles in a JSON file.
+- **Two-Stage Repair System (Innovation):**
+    1.  **Structure Repair:** Player uses `/consertar` to lift the pole back into place.
+    2.  **Wiring Repair:** Once lifted, it needs electrical work. Player uses `/fiacao` to restore light and finish the job.
+- **Global Notifications:** Displays the helpful citizen's name to the entire server upon completion.
 
 ## 🛠️ Installation
 1. Download the `cidade_viva` folder.
-2. Paste the folder into your FiveM server's `resources` directory.
-3. Add `ensure cidade_viva` to your `server.cfg` file.
+2. Paste into your `resources` directory.
+3. Add `ensure cidade_viva` to your `server.cfg`.
 4. Restart the server.
 
 ## 🎮 Commands
-- `/consertar` - Starts the repair process when near a destroyed object.
+- `/consertar` - Lifts the downed pole (Stage 1).
+- `/fiacao` - Performs electrical wiring and finishes the service (Stage 2).
 
 ---
 **Autor:** RZSISTEMA  

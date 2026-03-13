@@ -36,29 +36,30 @@ CreateThread(function()
                     local model = GetEntityModel(object)
                     local isPole = false
                     
-                    -- Lista de hashes de postes comuns no GTA V
+                    -- Lista de hashes de postes de luz validados (Podes adicionar mais conforme necessário)
                     local poles = {
                         [913072311] = true, [231806316] = true, [1431610996] = true,
                         [417435158] = true, [-1004169542] = true, [-379361138] = true,
-                        [4142142277] = true, [1182255740] = true, [669868735] = true
+                        [4142142277] = true, [1182255740] = true, [669868735] = true,
+                        [`prop_traffic_01a`] = true, [`prop_traffic_01b`] = true, [`prop_traffic_02a`] = true
                     }
                     
-                    if poles[model] or (GetEntityType(object) == 3 and not IsEntityAPed(object) and not IsEntityAVehicle(object)) then
+                    if poles[model] then
                         local oPos = GetEntityCoords(object)
                         
-                        -- FILTRO: Só envia se não for um objeto que já conhecemos ou que acabamos de consertar
+                        -- FILTRO: Só envia se não for um objeto que já conhecemos
                         local alreadyRegistered = false
                         for _, recorded in ipairs(destroyedObjects) do
-                            if #(vector3(recorded.coords.x, recorded.coords.y, recorded.coords.z) - oPos) < 5.0 then
+                            -- Raio maior para evitar detectar o topo do poste caído como um novo objeto
+                            if #(vector3(recorded.coords.x, recorded.coords.y, recorded.coords.z) - oPos) < 6.0 then
                                 alreadyRegistered = true
                                 break
                             end
                         end
 
                         if not alreadyRegistered then
-                             -- Tenta pegar a coordenada exata do chão/base para não registrar "voando" ou "dentro do bueiro"
-                             local _, groundZ = GetGroundZFor_3dCoord(oPos.x, oPos.y, oPos.z + 5.0, false)
-                             TriggerServerEvent('cidade_viva:registerDestroyed', model, vector3(oPos.x, oPos.y, groundZ))
+                             -- Captura a posição e força o registro na base para o reparo ser perfeito
+                             TriggerServerEvent('cidade_viva:registerDestroyed', model, oPos)
                         end
                     end
                 end

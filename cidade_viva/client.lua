@@ -33,9 +33,19 @@ CreateThread(function()
                 if GetEntityHealth(object) < 100 or not IsEntityUpright(object, 85.0) then
                     -- Evita registrar objetos de scripts ou carros
                     if GetEntityType(object) == 3 and not IsEntityAPed(object) and not IsEntityAVehicle(object) then
+                        local oPos = GetEntityCoords(object)
                         local model = GetEntityModel(object)
-                        -- Filtra para pegar apenas postes, hidrantes, lixeiras, etc. (ajustável)
-                        if model ~= 0 then
+                        
+                        -- FILTRO: Só envia se não for um objeto que já conhecemos
+                        local alreadyRegistered = false
+                        for _, recorded in ipairs(destroyedObjects) do
+                            if #(vector3(recorded.coords.x, recorded.coords.y, recorded.coords.z) - oPos) < 2.0 then
+                                alreadyRegistered = true
+                                break
+                            end
+                        end
+
+                        if not alreadyRegistered and model ~= 0 then
                              TriggerServerEvent('cidade_viva:registerDestroyed', model, oPos)
                         end
                     end

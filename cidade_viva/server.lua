@@ -30,7 +30,11 @@ AddEventHandler('cidade_viva:registerDestroyed', function(model, coords)
     end
     
     if not found then
-        table.insert(destroyedObjects, {model = model, coords = {x = coords.x, y = coords.y, z = coords.z}})
+        table.insert(destroyedObjects, {
+            model = model, 
+            coords = {x = coords.x, y = coords.y, z = coords.z},
+            needsWiring = false -- Começa precisando apenas do conserto físico
+        })
         SaveData()
         TriggerClientEvent('cidade_viva:syncObjects', -1, destroyedObjects)
     end
@@ -44,25 +48,40 @@ end)
 
 -- Comando Consertar
 RegisterCommand('consertar', function(source, args)
-    TriggerClientEvent('cidade_viva:checkRepair', source)
+    TriggerClientEvent('cidade_viva:checkRepair', source, "physical")
 end)
 
--- Finalizar conserto
+-- Comando Fiação
+RegisterCommand('fiacao', function(source, args)
+    TriggerClientEvent('cidade_viva:checkRepair', source, "wiring")
+end)
+
+-- Finalizar etapa de reparo
 RegisterNetEvent('cidade_viva:finishRepair')
-AddEventHandler('cidade_viva:finishRepair', function(index)
+AddEventHandler('cidade_viva:finishRepair', function(index, type)
     local playerName = GetPlayerName(source)
-    if destroyedObjects[index] then
-        local objData = destroyedObjects[index]
-        table.remove(destroyedObjects, index)
-        SaveData()
-        TriggerClientEvent('cidade_viva:syncObjects', -1, destroyedObjects)
-        
-        -- Evento específico para os clientes "levantarem" o objeto imediatamente
-        TriggerClientEvent('cidade_viva:objectFixed', -1, objData.coords, objData.model)
-        
-        -- Notificação lateral
-        TriggerClientEvent('chat:addMessage', -1, {
-            args = { "^2[ZELADORIA]", "^7O cidadão ^3" .. playerName .. " ^7consertou um item da prefeitura!" }
-        })
+    local objData = destroyedObjects[index]
+    
+    if objData then
+        if type == "physical" then
+            -- Passa para a fase de fiação
+            objData.needsWiring = true
+            SaveData()
+            TriggerClientEvent('cidade_viva:syncObjects', -1, destroyedObjects)
+            TriggerClientEvent('cidade_viva:objectFixed', -1, objData.coords, objData.model)
+            
+            TriggerClientEvent('chat:addMessage', source, {
+                args = { "^2[ZELADORIA]", "^7Reparo concluído! Chame a força e luz para fazer a ^3fiação do poste ^7(/fiacao)." }
+            })
+        elseif type == "wiring" then
+            -- Trabalho finalizado
+            table.remove(destroyedObjects, index)
+            SaveData()
+            TriggerClientEvent('cidade_viva:syncObjects', -1, destroyedObjects)
+            
+            TriggerClientEvent('chat:addMessage', -1, {
+                args = { "^2[ZELADORIA]", "^7O cidadão ^3" .. playerName .. " ^7finalizou a fiação e restaurou a luz!" }
+            })
+        end
     end
 end)

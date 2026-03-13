@@ -32,34 +32,33 @@ CreateThread(function()
             if dist < 50.0 then
                 -- Se o objeto é do mapa e está quebrado/caído
                 if GetEntityHealth(object) < 100 or not IsEntityUpright(object, 85.0) then
-                    -- Evita registrar objetos de scripts ou carros
-                    if GetEntityType(object) == 3 and not IsEntityAPed(object) and not IsEntityAVehicle(object) then
+                    -- Filtro de Modelos: Postes de Luz (hashes comuns)
+                    local model = GetEntityModel(object)
+                    local isPole = false
+                    
+                    -- Lista de hashes de postes comuns no GTA V
+                    local poles = {
+                        [913072311] = true, [231806316] = true, [1431610996] = true,
+                        [417435158] = true, [-1004169542] = true, [-379361138] = true,
+                        [4142142277] = true, [1182255740] = true, [669868735] = true
+                    }
+                    
+                    if poles[model] or (GetEntityType(object) == 3 and not IsEntityAPed(object) and not IsEntityAVehicle(object)) then
                         local oPos = GetEntityCoords(object)
-                        local model = GetEntityModel(object)
                         
                         -- FILTRO: Só envia se não for um objeto que já conhecemos ou que acabamos de consertar
                         local alreadyRegistered = false
-                        
-                        -- Checa se está na lista de destruídos
                         for _, recorded in ipairs(destroyedObjects) do
-                            if #(vector3(recorded.coords.x, recorded.coords.y, recorded.coords.z) - oPos) < 3.0 then
+                            if #(vector3(recorded.coords.x, recorded.coords.y, recorded.coords.z) - oPos) < 5.0 then
                                 alreadyRegistered = true
                                 break
                             end
                         end
 
-                        -- Checa se foi consertado recentemente (trava de re-detecção)
                         if not alreadyRegistered then
-                            for _, fixedPos in ipairs(recentlyFixed) do
-                                if #(fixedPos - oPos) < 3.0 then
-                                    alreadyRegistered = true
-                                    break
-                                end
-                            end
-                        end
-
-                        if not alreadyRegistered and model ~= 0 then
-                             TriggerServerEvent('cidade_viva:registerDestroyed', model, oPos)
+                             -- Tenta pegar a coordenada exata do chão/base para não registrar "voando" ou "dentro do bueiro"
+                             local _, groundZ = GetGroundZFor_3dCoord(oPos.x, oPos.y, oPos.z + 5.0, false)
+                             TriggerServerEvent('cidade_viva:registerDestroyed', model, vector3(oPos.x, oPos.y, groundZ))
                         end
                     end
                 end
@@ -83,8 +82,12 @@ CreateThread(function()
                 end
                 
                 -- Desenhar marcador 3D se estiver muito perto (Dica de reparo)
-                if dist < 3.0 and not isRepairing then
-                    DrawText3D(obj.coords.x, obj.coords.y, obj.coords.z + 1.0, "~w~Objeto ~r~Danificado~w~\nUse ~y~/consertar")
+                if dist < 4.0 and not isRepairing then
+                    if not obj.needsWiring then
+                        DrawText3D(obj.coords.x, obj.coords.y, obj.coords.z + 1.2, "~w~Poste ~r~Derrubado~w~\nUse ~y~/consertar")
+                    else
+                        DrawText3D(obj.coords.x, obj.coords.y, obj.coords.z + 1.2, "~w~Aguardando ~b~Fiação~w~\nUse ~y~/fiacao")
+                    end
                 end
             end
         end
@@ -123,41 +126,60 @@ end)
 
 -- Lógica de Reparo
 RegisterNetEvent('cidade_viva:checkRepair')
-AddEventHandler('cidade_viva:checkRepair', function()
+AddEventHandler('cidade_viva:checkRepair', function(type)
     local pPed = PlayerPedId()
     local pPos = GetEntityCoords(pPed)
     local foundIndex = nil
 
     for i, obj in ipairs(destroyedObjects) do
         local dist = #(pPos - vector3(obj.coords.x, obj.coords.y, obj.coords.z))
-        if dist < 3.0 then
-            foundIndex = i
-            break
+        if dist < 4.0 then
+            -- Verifica se o tipo de reparo bate com o estado do objeto
+            if type == "physical" and not obj.needsWiring then
+                foundIndex = i
+                break
+            elseif type == "wiring" and obj.needsWiring then
+                foundIndex = i
+                break
+            end
         end
     end
 
     if foundIndex and not isRepairing then
         isRepairing = true
-        TaskStartScenarioInPlace(pPed, "WORLD_HUMAN_WELDING", 0, true)
+        
+        local scenario = "WORLD_HUMAN_WELDING"
+        local duration = 7000
+        local label = "CONSERTANDO ESTRUTURA..."
+        
+        if type == "wiring" then
+            scenario = "WORLD_HUMAN_STAND_MOBILE"
+            duration = 5000
+            label = "FAZENDO FIAÇÃO..."
+        end
+
+        TaskStartScenarioInPlace(pPed, scenario, 0, true)
         
         -- Progresso
-        local timer = 7000 -- 7 segundos de reparo
+        local timer = duration
         CreateThread(function()
             while timer > 0 do
                 Wait(0)
                 timer = timer - 10
                 local obj = destroyedObjects[foundIndex]
                 if obj then
-                    DrawText3D(obj.coords.x, obj.coords.y, obj.coords.z + 1.2, "~y~CONSERTANDO... ~w~" .. math.floor((7000 - timer) / 70) .. "%")
+                    DrawText3D(obj.coords.x, obj.coords.y, obj.coords.z + 1.5, "~y~" .. label .. " ~w~" .. math.floor((duration - timer) / (duration/100)) .. "%")
                 end
             end
             
             ClearPedTasks(pPed)
             isRepairing = false
-            TriggerServerEvent('cidade_viva:finishRepair', foundIndex)
+            TriggerServerEvent('cidade_viva:finishRepair', foundIndex, type)
         end)
     else
-        TriggerEvent('chat:addMessage', { args = { "^1[ERRO]", "^7Não há nada para consertar por perto." } })
+        local reason = "Não há nada para consertar aqui."
+        if type == "fiacao" then reason = "Este poste ainda não foi levantado ou já tem fiação." end
+        TriggerEvent('chat:addMessage', { args = { "^1[ERRO]", "^7" .. reason } })
     end
 end)
 

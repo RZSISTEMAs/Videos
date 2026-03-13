@@ -22,7 +22,8 @@ RegisterNetEvent('cidade_viva:registerDestroyed')
 AddEventHandler('cidade_viva:registerDestroyed', function(model, coords)
     local found = false
     for _, obj in ipairs(destroyedObjects) do
-        if #(vector3(obj.coords.x, obj.coords.y, obj.coords.z) - coords) < 1.0 then
+        -- Raio de 3.0 metros para evitar registrar escombros duplicados do mesmo objeto
+        if #(vector3(obj.coords.x, obj.coords.y, obj.coords.z) - coords) < 3.0 then
             found = true
             break
         end
@@ -51,9 +52,13 @@ RegisterNetEvent('cidade_viva:finishRepair')
 AddEventHandler('cidade_viva:finishRepair', function(index)
     local playerName = GetPlayerName(source)
     if destroyedObjects[index] then
+        local objData = destroyedObjects[index]
         table.remove(destroyedObjects, index)
         SaveData()
         TriggerClientEvent('cidade_viva:syncObjects', -1, destroyedObjects)
+        
+        -- Evento específico para os clientes "levantarem" o objeto imediatamente
+        TriggerClientEvent('cidade_viva:objectFixed', -1, objData.coords, objData.model)
         
         -- Notificação lateral
         TriggerClientEvent('chat:addMessage', -1, {

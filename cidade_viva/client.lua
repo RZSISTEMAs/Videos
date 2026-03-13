@@ -1,5 +1,6 @@
 local destroyedObjects = {}
 local isRepairing = false
+local recentlyFixed = {} -- Trava para não re-detectar o mesmo item logo após o conserto
 
 -- Sincronizar objetos com o servidor
 RegisterNetEvent('cidade_viva:syncObjects')
@@ -36,12 +37,24 @@ CreateThread(function()
                         local oPos = GetEntityCoords(object)
                         local model = GetEntityModel(object)
                         
-                        -- FILTRO: Só envia se não for um objeto que já conhecemos
+                        -- FILTRO: Só envia se não for um objeto que já conhecemos ou que acabamos de consertar
                         local alreadyRegistered = false
+                        
+                        -- Checa se está na lista de destruídos
                         for _, recorded in ipairs(destroyedObjects) do
-                            if #(vector3(recorded.coords.x, recorded.coords.y, recorded.coords.z) - oPos) < 2.0 then
+                            if #(vector3(recorded.coords.x, recorded.coords.y, recorded.coords.z) - oPos) < 3.0 then
                                 alreadyRegistered = true
                                 break
+                            end
+                        end
+
+                        -- Checa se foi consertado recentemente (trava de re-detecção)
+                        if not alreadyRegistered then
+                            for _, fixedPos in ipairs(recentlyFixed) do
+                                if #(fixedPos - oPos) < 3.0 then
+                                    alreadyRegistered = true
+                                    break
+                                end
                             end
                         end
 
@@ -77,6 +90,34 @@ CreateThread(function()
         end
 
         Wait(sleep)
+    end
+end)
+
+-- Evento para restaurar o objeto visualmente para todos
+RegisterNetEvent('cidade_viva:objectFixed')
+AddEventHandler('cidade_viva:objectFixed', function(coords, model)
+    local vCoords = vector3(coords.x, coords.y, coords.z)
+    
+    -- Adiciona à lista de ignorados temporariamente
+    table.insert(recentlyFixed, vCoords)
+    SetTimeout(10000, function() -- Remove da trava após 10 segundos
+        for i, pos in ipairs(recentlyFixed) do
+            if pos == vCoords then
+                table.remove(recentlyFixed, i)
+                break
+            end
+        end
+    end)
+
+    -- Tenta "levantar" o objeto original
+    local mapObj = GetClosestObjectOfType(vCoords.x, vCoords.y, vCoords.z, 5.0, model, false, false, false)
+    if DoesEntityExist(mapObj) then
+        SetEntityCoords(mapObj, vCoords.x, vCoords.y, vCoords.z)
+        SetEntityRotation(mapObj, 0.0, 0.0, 0.0, 2, true)
+        SetEntityHealth(mapObj, 1000)
+        FreezeEntityPosition(mapObj, true) -- Congela para não cair de novo
+        Wait(500)
+        FreezeEntityPosition(mapObj, false)
     end
 end)
 

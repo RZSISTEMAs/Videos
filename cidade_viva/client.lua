@@ -30,7 +30,7 @@ CreateThread(function()
 
             if dist < 50.0 then
                 -- Se o objeto é do mapa e está quebrado/caído
-                if HasEntityCollidedWithBound(object) or GetEntityHealth(object) < 100 then
+                if GetEntityHealth(object) < 100 or not IsEntityUpright(object, 85.0) then
                     -- Evita registrar objetos de scripts ou carros
                     if GetEntityType(object) == 3 and not IsEntityAPed(object) and not IsEntityAVehicle(object) then
                         local model = GetEntityModel(object)

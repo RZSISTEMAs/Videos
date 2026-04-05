@@ -11,4 +11,4 @@ Config.Ranks = {
     ["Player"] = 0
 }
 
-Config.OpenKey = 199 -- Tecla P (Mapping 199 no GTA V)
+Config.OpenKey = 121 -- Tecla INSERT (Comum para menus de administração)

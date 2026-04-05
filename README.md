@@ -40,6 +40,7 @@ Whether you are a server owner looking to enhance your Roleplay, or a developer 
 * 📦 **[airdrop](./airdrop/)** - Sistema de suprimentos caídos do céu com avião Titan, física de paraquedas e guardas NPCs protegendo a carga. (Advanced airdrop system with parachute physics and NPC guards).
   * 🎞️ **[Assista ao Tutorial de Funcionamento no YouTube](https://www.youtube.com/watch?v=NwqZOcAI6Lo)**
 * 🏙️ **[cidade_viva](./cidade_viva/)** - Sistema inovador de destruição persistente onde o mapa só é restaurado se os jogadores consertarem os objetos. (Innovative persistent destruction system).
+* 🛡️ **[painel_p](./painel_p/)** - Menu Admin Premium Standalone com interface moderna, sistema de permissões por ID e ferramentas completas de gestão. (Premium Standalone Admin Menu).
 
 <br>
 

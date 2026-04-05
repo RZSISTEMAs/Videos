@@ -15,36 +15,51 @@ end)
 
 -- Receber dados do servidor e abrir NUI
 RegisterNetEvent('painel_p:receiveData')
-AddEventHandler('painel_p:receiveData', function(rank, players)
+AddEventHandler('painel_p:receiveData', function(rank, players, vehicles, objects)
     playerRank = rank
     playerList = players
     
     if playerRank ~= "Player" then
-        ToggleMenu(not isOpen)
+        isOpen = not isOpen
+        SetNuiFocus(isOpen, isOpen)
+        SendNUIMessage({
+            type = "show",
+            status = isOpen,
+            rank = playerRank,
+            players = playerList,
+            vehicles = vehicles,
+            objects = objects
+        })
     else
         TriggerEvent('chat:addMessage', { args = { '^1[ACESSO NEGADO]', '^7Apenas administradores podem usar o Painel P.' } })
     end
 end)
 
-function ToggleMenu(toggle)
-    isOpen = toggle
-    SetNuiFocus(toggle, toggle)
-    SendNUIMessage({
-        type = "show",
-        status = toggle,
-        rank = playerRank,
-        players = playerList
-    })
-end
-
--- Callbacks da NUI
-RegisterNUICallback('close', function(data, cb)
-    ToggleMenu(false)
+-- Spawn de Veículos
+RegisterNUICallback('spawnVehicle', function(data, cb)
+    local model = data.model
+    local ped = PlayerPedId()
+    local coords = GetEntityCoords(ped)
+    
+    RequestModel(model)
+    while not HasModelLoaded(model) do Wait(10) end
+    
+    local veh = CreateVehicle(model, coords.x, coords.y, coords.z, GetEntityHeading(ped), true, false)
+    TaskWarpPedIntoVehicle(ped, veh, -1)
     cb('ok')
 end)
 
-RegisterNUICallback('adminAction', function(data, cb)
-    TriggerServerEvent('painel_p:adminAction', data.id, data.action)
+-- Spawn de Objetos
+RegisterNUICallback('spawnObject', function(data, cb)
+    local model = data.model
+    local ped = PlayerPedId()
+    local coords = GetOffsetFromEntityInWorldCoords(ped, 0.0, 2.0, 0.0)
+    
+    RequestModel(model)
+    while not HasModelLoaded(model) do Wait(10) end
+    
+    local obj = CreateObject(model, coords.x, coords.y, coords.z, true, true, true)
+    PlaceObjectOnGroundProperly(obj)
     cb('ok')
 end)
 
@@ -54,17 +69,18 @@ RegisterNUICallback('selfAction', function(data, cb)
     
     if action == "god" then
         SetEntityInvincible(ped, true)
-        SetPlayerInvincible(PlayerId(), true)
-        TriggerEvent('chat:addMessage', { args = { '[SELF]', 'Modo Deus Ativado.' } })
     elseif action == "godoff" then
         SetEntityInvincible(ped, false)
-        SetPlayerInvincible(PlayerId(), false)
-        TriggerEvent('chat:addMessage', { args = { '[SELF]', 'Modo Deus Desativado.' } })
     elseif action == "heal" then
         SetEntityHealth(ped, GetEntityMaxHealth(ped))
         SetPedArmour(ped, 100)
-    elseif action == "ghost" then
-        SetEntityVisible(ped, not IsEntityVisible(ped), false)
+    elseif action == "dv" then
+        local veh = GetVehiclePedIsIn(ped, false)
+        if veh == 0 then veh = GetClosestVehicle(GetEntityCoords(ped), 5.0, 0, 71) end
+        if veh ~= 0 then DeleteVehicle(veh) end
+    elseif action == "fix" then
+        local veh = GetVehiclePedIsIn(ped, false)
+        if veh ~= 0 then SetVehicleFixed(veh) SetVehicleDirtLevel(veh, 0.0) end
     end
     cb('ok')
 end)

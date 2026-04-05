@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel P - Admin Menu</title>
+    <title>Painel P 2.0 - RZSISTEMA</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
@@ -14,58 +14,67 @@
         <div class="sidebar">
             <div class="logo">
                 <h1>RZSISTEMA</h1>
-                <span class="rank">{{ playerRank }}</span>
+                <span class="rank-badge">{{ playerRank }}</span>
             </div>
             <nav>
                 <div class="nav-item" :class="{active: tab == 'home'}" @click="tab = 'home'">🏠 Home</div>
                 <div class="nav-item" :class="{active: tab == 'players'}" @click="tab = 'players'">👥 Jogadores</div>
-                <div class="nav-item" :class="{active: tab == 'self'}" @click="tab = 'self'">⚙️ Self Admin</div>
-                <div class="nav-item" :class="{active: tab == 'world'}" @click="tab = 'world'">🌍 Mundo</div>
+                <div class="nav-item" :class="{active: tab == 'vehicles'}" @click="tab = 'vehicles'">🚗 Veículos</div>
+                <div class="nav-item" :class="{active: tab == 'objects'}" @click="tab = 'objects'">🚧 Objetos</div>
+                <div class="nav-item" :class="{active: tab == 'self'}" @click="tab = 'self'">⚙️ Ferramentas</div>
             </nav>
             <div class="footer">
-                <button class="close-btn" @click="closeMenu">SAIR (ESC)</button>
+                <button class="close-btn" @click="closeMenu">FECHAR (ESC)</button>
             </div>
         </div>
 
         <!-- Main Content -->
         <div class="main">
-            <!-- Home Tab -->
+            <!-- Home -->
             <div v-if="tab == 'home'" class="content">
-                <h2>Seja bem-vindo, {{ playerRank }}!</h2>
-                <div class="stats">
-                    <div class="stat-card">
-                        <h3>Online</h3>
+                <h2>Olá, Administrador!</h2>
+                <div class="dashboard-grid">
+                    <div class="stat-box">
+                        <h3>Jogadores</h3>
                         <p>{{ players.length }}</p>
                     </div>
-                    <div class="stat-card">
-                        <h3>ID</h3>
-                        <p>#1</p>
+                    <div class="stat-box">
+                        <h3>Cargo</h3>
+                        <p>{{ playerRank }}</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Players Tab -->
+            <!-- Players -->
             <div v-if="tab == 'players'" class="content">
-                <h2>Lista de Jogadores</h2>
-                <input type="text" v-model="search" placeholder="Pesquisar por Nome ou ID..." class="search">
-                <div class="player-list">
-                    <table>
+                <h2>Gerenciar Jogadores</h2>
+                <input type="text" v-model="search" placeholder="Buscar por Nome ou ID..." class="search-bar">
+                <div class="scroll-area">
+                    <table class="players-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Nome</th>
+                                <th>Cargo</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="player in filteredPlayers" :key="player.id">
-                                <td>#{{ player.id }}</td>
-                                <td>{{ player.name }}</td>
-                                <td>
-                                    <button class="btn tp" @click="action(player.id, 'tpto')">TP TO</button>
-                                    <button class="btn tp" @click="action(player.id, 'tphere')">TP HERE</button>
-                                    <button class="btn kick" @click="action(player.id, 'kick')">KICK</button>
-                                    <button class="btn ban" @click="action(player.id, 'ban')">BAN</button>
+                            <tr v-for="p in filteredPlayers" :key="p.id">
+                                <td>#{{ p.id }}</td>
+                                <td>{{ p.name }}</td>
+                                <td><span class="p-rank">{{ p.rank }}</span></td>
+                                <td class="actions">
+                                    <button class="act tp" @click="action(p.id, 'tpto')">IR</button>
+                                    <button class="act tp" @click="action(p.id, 'tphere')">PUXAR</button>
+                                    <button class="act kick" @click="action(p.id, 'kick')">EXPULSAR</button>
+                                    <select class="rank-select" @change="setRank(p.id, $event)" v-if="playerRank == 'Dono'">
+                                        <option value="">Alterar Cargo</option>
+                                        <option value="Dono">Dono</option>
+                                        <option value="Admin">Admin</option>
+                                        <option value="Moderador">Moderador</option>
+                                        <option value="Player">Player</option>
+                                    </select>
                                 </td>
                             </tr>
                         </tbody>
@@ -73,28 +82,50 @@
                 </div>
             </div>
 
-            <!-- Self Tab -->
-            <div v-if="tab == 'self'" class="content">
-                <h2>Opções Próprias</h2>
-                <div class="grid">
-                    <button class="action-btn" @click="selfAction('god')">GOD MODE</button>
-                    <button class="action-btn" @click="selfAction('heal')">CURAR</button>
-                    <button class="action-btn" @click="selfAction('ghost')">FANTASMA</button>
+            <!-- Vehicles -->
+            <div v-if="tab == 'vehicles'" class="content">
+                <h2>Spawn de Veículos</h2>
+                <div class="scroll-area">
+                    <div v-for="cat in vehicles" :key="cat.category" class="cat-group">
+                        <h3>{{ cat.category }}</h3>
+                        <div class="grid">
+                            <button v-for="v in cat.models" :key="v" class="spawn-btn" @click="spawnVehicle(v)">
+                                {{ v.toUpperCase() }}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- World Tab -->
-            <div v-if="tab == 'world'" class="content">
-                <h2>Controle do Mundo</h2>
+            <!-- Objects -->
+            <div v-if="tab == 'objects'" class="content">
+                <h2>Sinalização e Objetos</h2>
                 <div class="grid">
-                    <button class="action-btn" @click="worldAction('clear')">LIMPAR CHAT</button>
-                    <button class="action-btn" @click="worldAction('sunny')">LIMPO</button>
-                    <button class="action-btn" @click="worldAction('rain')">CHUVA</button>
+                    <button v-for="obj in objects" :key="obj.model" class="spawn-btn obj" @click="spawnObject(obj.model)">
+                        {{ obj.name }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Self Tools -->
+            <div v-if="tab == 'self'" class="content">
+                <h2>Minhas Ferramentas</h2>
+                <div class="grid">
+                    <button class="tool-btn heal" @click="selfAction('heal')">VIDA/COLETE</button>
+                    <button class="tool-btn god" @click="selfAction('god')">MODO DEUS</button>
+                    <button class="tool-btn godoff" @click="selfAction('godoff')">MORTAL</button>
+                    <button class="tool-btn fix" @click="selfAction('fix')">CONSERTAR CARRO</button>
+                    <button class="tool-btn dv" @click="selfAction('dv')">DELETAR CARRO</button>
+                </div>
+                <h2 style="margin-top: 30px;">Tempo e Clima</h2>
+                <div class="grid">
+                    <button class="weather-btn" @click="action(0, 'weather', 'EXTRASUNNY')">ENSOLARADO</button>
+                    <button class="weather-btn" @click="action(0, 'weather', 'RAIN')">CHUVA</button>
+                    <button class="weather-btn" @click="action(0, 'weather', 'CLEARING')">NATALIN</button>
                 </div>
             </div>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>

@@ -5,12 +5,13 @@ const app = new Vue({
         tab: 'home',
         playerRank: 'Player',
         search: '',
-        players: [
-            {id: 1, name: 'Richard', ping: 25}
-        ]
+        players: [],
+        vehicles: [],
+        objects: []
     },
     computed: {
         filteredPlayers() {
+            if (!this.search) return this.players;
             return this.players.filter(p => {
                 return p.name.toLowerCase().includes(this.search.toLowerCase()) || p.id.toString().includes(this.search);
             });
@@ -24,10 +25,10 @@ const app = new Vue({
                 body: JSON.stringify({})
             });
         },
-        action(id, type) {
+        action(id, type, extra) {
             fetch(`https://${GetParentResourceName()}/adminAction`, {
                 method: 'POST',
-                body: JSON.stringify({ id: id, action: type })
+                body: JSON.stringify({ id: id, action: type, extra: extra })
             });
         },
         selfAction(type) {
@@ -36,11 +37,24 @@ const app = new Vue({
                 body: JSON.stringify({ action: type })
             });
         },
-        worldAction(type) {
-            fetch(`https://${GetParentResourceName()}/adminAction`, {
+        spawnVehicle(model) {
+            fetch(`https://${GetParentResourceName()}/spawnVehicle`, {
                 method: 'POST',
-                body: JSON.stringify({ id: 0, action: type })
+                body: JSON.stringify({ model: model })
             });
+        },
+        spawnObject(model) {
+            fetch(`https://${GetParentResourceName()}/spawnObject`, {
+                method: 'POST',
+                body: JSON.stringify({ model: model })
+            });
+        },
+        setRank(id, event) {
+            const rank = event.target.value;
+            if (rank) {
+                this.action(id, 'setrank', rank);
+                event.target.value = ''; // Reset select
+            }
         }
     }
 });
@@ -52,6 +66,8 @@ window.addEventListener('message', (event) => {
         app.visible = data.status;
         app.playerRank = data.rank;
         app.players = data.players;
+        app.vehicles = data.vehicles;
+        app.objects = data.objects;
     }
 });
 

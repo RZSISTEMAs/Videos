@@ -1,21 +1,37 @@
--- Sistema de Permissões Standalone
+-- Sistema de Permissões Standalone com Persistência em JSON
 local admins = {}
+local adminsFile = "admins.json"
 
--- Carrega admins do config inicial
+-- Carregar admins do JSON ao iniciar
 AddEventHandler('onResourceStart', function(resourceName)
     if GetCurrentResourceName() ~= resourceName then return end
+    
+    -- Primeiro carrega do Config (Predefinição)
     for id, rank in pairs(Config.AccessControl) do
         admins[tonumber(id)] = rank
     end
+    
+    -- Depois carrega do arquivo salvo (Persistência)
+    local file = LoadResourceFile(GetCurrentResourceName(), adminsFile)
+    if file then
+        local savedAdmins = json.decode(file)
+        for id, rank in pairs(savedAdmins) do
+            admins[tonumber(id)] = rank
+        end
+    end
 end)
+
+-- Salvar admins no JSON
+function SaveAdmins()
+    SaveResourceFile(GetCurrentResourceName(), adminsFile, json.encode(admins), -1)
+end
 
 -- Pega o cargo do jogador (ID do Servidor)
 function GetPlayerRank(source)
-    local id = tonumber(source)
-    return admins[id] or "Player"
+    return admins[tonumber(source)] or "Player"
 end
 
--- Callback para o cliente saber o cargo e a lista de players
+-- Callback para o cliente saber o cargo e a lista de players + config de spawn
 RegisterNetEvent('painel_p:requestData')
 AddEventHandler('painel_p:requestData', function()
     local source = source
@@ -26,27 +42,25 @@ AddEventHandler('painel_p:requestData', function()
         table.insert(players, {
             id = playerId,
             name = GetPlayerName(playerId),
+            rank = GetPlayerRank(playerId),
             ping = GetPlayerPing(playerId)
         })
     end
     
-    TriggerClientEvent('painel_p:receiveData', source, rank, players)
+    TriggerClientEvent('painel_p:receiveData', source, rank, players, Config.Vehicles, Config.Objects)
 end)
 
 -- AÇÕES ADMINISTRATIVAS (Mandar executar no Alvo)
 RegisterNetEvent('painel_p:adminAction')
-AddEventHandler('painel_p:adminAction', function(targetId, action)
+AddEventHandler('painel_p:adminAction', function(targetId, action, extra)
     local source = source
     local adminRank = GetPlayerRank(source)
     
-    -- Validação de Segurança
+    -- Validação de Segurança (Precisa ser Admin ou Moderador pelo menos)
     if adminRank == "Player" then return end
     
     if action == "kick" then
-        DropPlayer(targetId, "[PAINEL P] Você foi expulso do servidor por um administrador.")
-    elseif action == "ban" then
-        -- Simulação de Ban (Standalone precisa de arquivo JSON ou SQL)
-        DropPlayer(targetId, "[PAINEL P] Você foi banido permanentemente.")
+        DropPlayer(targetId, "[PAINEL P] Expulso por: " .. GetPlayerName(source))
     elseif action == "tpto" then
         local targetCoords = GetEntityCoords(GetPlayerPed(targetId))
         TriggerClientEvent('painel_p:teleport', source, targetCoords)
@@ -55,16 +69,16 @@ AddEventHandler('painel_p:adminAction', function(targetId, action)
         TriggerClientEvent('painel_p:teleport', targetId, adminCoords)
     elseif action == "kill" then
         TriggerClientEvent('painel_p:kill', targetId)
+    elseif action == "setrank" and adminRank == "Dono" then
+        admins[tonumber(targetId)] = extra
+        SaveAdmins()
+        TriggerClientEvent('chat:addMessage', -1, { args = { '^1[SISTEMA]', '^7O jogador ^3' .. GetPlayerName(targetId) .. ' ^7foi promovido a ^2' .. extra } })
+        -- Sincroniza dados com todos
+        TriggerEvent('painel_p:requestData')
+    elseif action == "weather" then
+        ExecuteCommand("weather " .. extra)
     end
     
     -- Log no Console
     print("^1[ADMIN] ^7O " .. adminRank .. " " .. GetPlayerName(source) .. " executou ^3" .. action .. "^7 no ID " .. targetId)
-end)
-
--- Alterar Clima/Tempo (Global)
-RegisterNetEvent('painel_p:setWeather')
-AddEventHandler('painel_p:setWeather', function(weather)
-    if GetPlayerRank(source) ~= "Player" then
-        ExecuteCommand("weather " .. weather)
-    end
 end)

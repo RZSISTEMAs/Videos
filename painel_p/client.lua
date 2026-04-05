@@ -15,7 +15,7 @@ end)
 
 -- Receber dados do servidor e abrir NUI
 RegisterNetEvent('painel_p:receiveData')
-AddEventHandler('painel_p:receiveData', function(rank, players, vehicles, objects)
+AddEventHandler('painel_p:receiveData', function(rank, players, vehicles, objects, weather)
     playerRank = rank
     playerList = players
     
@@ -28,7 +28,8 @@ AddEventHandler('painel_p:receiveData', function(rank, players, vehicles, object
             rank = playerRank,
             players = playerList,
             vehicles = vehicles,
-            objects = objects
+            objects = objects,
+            weather = weather
         })
     else
         TriggerEvent('chat:addMessage', { args = { '^1[ACESSO NEGADO]', '^7Apenas administradores podem usar o Painel P.' } })
@@ -49,17 +50,19 @@ RegisterNUICallback('spawnVehicle', function(data, cb)
     cb('ok')
 end)
 
--- Spawn de Objetos
+-- Spawn de Objetos (MELHORADO)
 RegisterNUICallback('spawnObject', function(data, cb)
     local model = data.model
     local ped = PlayerPedId()
-    local coords = GetOffsetFromEntityInWorldCoords(ped, 0.0, 2.0, 0.0)
+    -- Spawn 2 metros à frente do jogador
+    local coords = GetOffsetFromEntityInWorldCoords(ped, 0.0, 2.5, 0.0)
     
     RequestModel(model)
     while not HasModelLoaded(model) do Wait(10) end
     
     local obj = CreateObject(model, coords.x, coords.y, coords.z, true, true, true)
     PlaceObjectOnGroundProperly(obj)
+    FreezeEntityPosition(obj, true) -- Congela para evitar bugs de física
     cb('ok')
 end)
 

@@ -47,7 +47,7 @@ AddEventHandler('painel_p:requestData', function()
         })
     end
     
-    TriggerClientEvent('painel_p:receiveData', source, rank, players, Config.Vehicles, Config.Objects)
+    TriggerClientEvent('painel_p:receiveData', source, rank, players, Config.Vehicles, Config.Objects, Config.WeatherTypes)
 end)
 
 -- AÇÕES ADMINISTRATIVAS (Mandar executar no Alvo)
@@ -73,10 +73,14 @@ AddEventHandler('painel_p:adminAction', function(targetId, action, extra)
         admins[tonumber(targetId)] = extra
         SaveAdmins()
         TriggerClientEvent('chat:addMessage', -1, { args = { '^1[SISTEMA]', '^7O jogador ^3' .. GetPlayerName(targetId) .. ' ^7foi promovido a ^2' .. extra } })
-        -- Sincroniza dados com todos
+        -- Renviar dados para todos
         TriggerEvent('painel_p:requestData')
     elseif action == "weather" then
+        -- Define o clima globalmente (Sincronizado se o clima do server estiver ativo)
         ExecuteCommand("weather " .. extra)
+    elseif action == "time" then
+        -- Define a hora globalmente
+        ExecuteCommand("time " .. extra)
     end
     
     -- Log no Console

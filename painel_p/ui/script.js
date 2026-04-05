@@ -7,13 +7,15 @@ const app = new Vue({
         search: '',
         players: [],
         vehicles: [],
-        objects: []
+        objects: [],
+        weather: []
     },
     computed: {
         filteredPlayers() {
             if (!this.search) return this.players;
+            const s = this.search.toLowerCase();
             return this.players.filter(p => {
-                return p.name.toLowerCase().includes(this.search.toLowerCase()) || p.id.toString().includes(this.search);
+                return p.name.toLowerCase().includes(s) || p.id.toString().includes(s);
             });
         }
     },
@@ -68,10 +70,11 @@ window.addEventListener('message', (event) => {
         app.players = data.players;
         app.vehicles = data.vehicles;
         app.objects = data.objects;
+        app.weather = data.weather;
     }
 });
 
-// Fechar com ESC
+// Fechar com ESC (Garante que o foco saia do jogo)
 document.onkeyup = function (data) {
     if (data.which == 27) { // ESC Key
         app.closeMenu();

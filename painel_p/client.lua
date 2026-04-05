@@ -63,6 +63,18 @@ RegisterNUICallback('spawnObject', function(data, cb)
     cb('ok')
 end)
 
+-- Callbacks da NUI
+RegisterNUICallback('close', function(data, cb)
+    isOpen = false
+    SetNuiFocus(false, false)
+    cb('ok')
+end)
+
+RegisterNUICallback('adminAction', function(data, cb)
+    TriggerServerEvent('painel_p:adminAction', data.id, data.action, data.extra)
+    cb('ok')
+end)
+
 RegisterNUICallback('selfAction', function(data, cb)
     local ped = PlayerPedId()
     local action = data.action
@@ -77,10 +89,15 @@ RegisterNUICallback('selfAction', function(data, cb)
     elseif action == "dv" then
         local veh = GetVehiclePedIsIn(ped, false)
         if veh == 0 then veh = GetClosestVehicle(GetEntityCoords(ped), 5.0, 0, 71) end
-        if veh ~= 0 then DeleteVehicle(veh) end
+        if (veh ~= 0) then 
+            SetEntityAsMissionEntity(veh, true, true)
+            DeleteVehicle(veh) 
+        end
     elseif action == "fix" then
         local veh = GetVehiclePedIsIn(ped, false)
         if veh ~= 0 then SetVehicleFixed(veh) SetVehicleDirtLevel(veh, 0.0) end
+    elseif action == "ghost" then
+        SetEntityVisible(ped, not IsEntityVisible(ped), false)
     end
     cb('ok')
 end)

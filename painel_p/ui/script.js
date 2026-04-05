@@ -20,31 +20,31 @@ const app = new Vue({
     methods: {
         closeMenu() {
             this.visible = false;
-            fetch(`https://${GetParentResourceName()}/close`, {
+            fetch(`https://painel_p/close`, {
                 method: 'POST',
                 body: JSON.stringify({})
             });
         },
         action(id, type, extra) {
-            fetch(`https://${GetParentResourceName()}/adminAction`, {
+            fetch(`https://painel_p/adminAction`, {
                 method: 'POST',
                 body: JSON.stringify({ id: id, action: type, extra: extra })
             });
         },
         selfAction(type) {
-            fetch(`https://${GetParentResourceName()}/selfAction`, {
+            fetch(`https://painel_p/selfAction`, {
                 method: 'POST',
                 body: JSON.stringify({ action: type })
             });
         },
         spawnVehicle(model) {
-            fetch(`https://${GetParentResourceName()}/spawnVehicle`, {
+            fetch(`https://painel_p/spawnVehicle`, {
                 method: 'POST',
                 body: JSON.stringify({ model: model })
             });
         },
         spawnObject(model) {
-            fetch(`https://${GetParentResourceName()}/spawnObject`, {
+            fetch(`https://painel_p/spawnObject`, {
                 method: 'POST',
                 body: JSON.stringify({ model: model })
             });

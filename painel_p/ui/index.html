@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel P - Admin Menu</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+</head>
+<body>
+    <div id="app" v-show="visible" class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>RZSISTEMA</h1>
+                <span class="rank">{{ playerRank }}</span>
+            </div>
+            <nav>
+                <div class="nav-item" :class="{active: tab == 'home'}" @click="tab = 'home'">🏠 Home</div>
+                <div class="nav-item" :class="{active: tab == 'players'}" @click="tab = 'players'">👥 Jogadores</div>
+                <div class="nav-item" :class="{active: tab == 'self'}" @click="tab = 'self'">⚙️ Self Admin</div>
+                <div class="nav-item" :class="{active: tab == 'world'}" @click="tab = 'world'">🌍 Mundo</div>
+            </nav>
+            <div class="footer">
+                <button class="close-btn" @click="closeMenu">SAIR (ESC)</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main">
+            <!-- Home Tab -->
+            <div v-if="tab == 'home'" class="content">
+                <h2>Seja bem-vindo, {{ playerRank }}!</h2>
+                <div class="stats">
+                    <div class="stat-card">
+                        <h3>Online</h3>
+                        <p>{{ players.length }}</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>ID</h3>
+                        <p>#1</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Players Tab -->
+            <div v-if="tab == 'players'" class="content">
+                <h2>Lista de Jogadores</h2>
+                <input type="text" v-model="search" placeholder="Pesquisar por Nome ou ID..." class="search">
+                <div class="player-list">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="player in filteredPlayers" :key="player.id">
+                                <td>#{{ player.id }}</td>
+                                <td>{{ player.name }}</td>
+                                <td>
+                                    <button class="btn tp" @click="action(player.id, 'tpto')">TP TO</button>
+                                    <button class="btn tp" @click="action(player.id, 'tphere')">TP HERE</button>
+                                    <button class="btn kick" @click="action(player.id, 'kick')">KICK</button>
+                                    <button class="btn ban" @click="action(player.id, 'ban')">BAN</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Self Tab -->
+            <div v-if="tab == 'self'" class="content">
+                <h2>Opções Próprias</h2>
+                <div class="grid">
+                    <button class="action-btn" @click="selfAction('god')">GOD MODE</button>
+                    <button class="action-btn" @click="selfAction('heal')">CURAR</button>
+                    <button class="action-btn" @click="selfAction('ghost')">FANTASMA</button>
+                </div>
+            </div>
+
+            <!-- World Tab -->
+            <div v-if="tab == 'world'" class="content">
+                <h2>Controle do Mundo</h2>
+                <div class="grid">
+                    <button class="action-btn" @click="worldAction('clear')">LIMPAR CHAT</button>
+                    <button class="action-btn" @click="worldAction('sunny')">LIMPO</button>
+                    <button class="action-btn" @click="worldAction('rain')">CHUVA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

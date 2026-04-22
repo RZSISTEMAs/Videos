@@ -6,14 +6,11 @@ local isAssaltoLivre = false
 
 -- Esconder componentes do HUD nativo e o Minimapa
 Citizen.CreateThread(function()
-    RequestStreamedTextureDict("squareminimap", false)
-    while not HasStreamedTextureDictLoaded("squareminimap") do
-        Wait(100)
-    end
-    AddReplaceTexture("platform:/textures/graphics", "radarmasksm", "squareminimap", "radarmasksm")
-    
     -- Configurao do Minimapa Moderno (Quadrado)
     SetMinimapClipType(1) 
+    SetRadarBigmapEnabled(true, false)
+    Wait(0)
+    SetRadarBigmapEnabled(false, false)
 
     while true do
         Citizen.Wait(0)
@@ -21,9 +18,13 @@ Citizen.CreateThread(function()
         local inVehicle = IsPedInAnyVehicle(ped, false)
 
         -- Mostrar mapa apenas se estiver no carro
-        DisplayRadar(inVehicle)
+        if inVehicle then
+            DisplayRadar(true)
+        else
+            DisplayRadar(false)
+        end
         
-        -- Esconde vida, armas, dinheiro e NOME DO CARRO nativo
+        -- Esconde componentes nativos com segurana
         HideHudComponentThisFrame(3) -- SP_CASH
         HideHudComponentThisFrame(4) -- MP_CASH
         HideHudComponentThisFrame(13) -- PL_NAME
@@ -31,6 +32,7 @@ Citizen.CreateThread(function()
         HideHudComponentThisFrame(9) -- STREET_NAME
         HideHudComponentThisFrame(6) -- VEHICLE_NAME
         HideHudComponentThisFrame(8) -- VEHICLE_CLASS
+        HideHudComponentThisFrame(2) -- WEAPON_ICON
         
         -- Bloquear sada se estiver de cinto
         if isSeatbeltOn then
@@ -42,8 +44,11 @@ Citizen.CreateThread(function()
             local veh = GetVehiclePedIsIn(ped, false)
             if not engineStatus then
                 SetVehicleEngineOn(veh, false, true, true)
+                SetVehicleEngineCanTick(veh, false) -- NOVO: Impede o motor de processar
                 DisableControlAction(2, 71, true) -- W (Acelerar)
                 DisableControlAction(2, 72, true) -- S (Frear/R)
+            else
+                SetVehicleEngineCanTick(veh, true)
             end
         else
             engineStatus = true

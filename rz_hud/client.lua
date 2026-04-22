@@ -128,37 +128,119 @@ Citizen.CreateThread(function()
             armor = armor
         })
 
-        Citizen.Wait(waitTime)
+        Citizen.Wait(0)
     end
 end)
 
--- Controle de Ambiente (Procurado e Densidade de NPCs/Trfego)
+-- Listas de Modelos de Elite e Polcia
+local supercars = { "adder", "zentorno", "t20", "osiris", "vacca", "turismor", "tempesta", "italigtb", "nero", "nero2", "prototipo", "visione", "cyclone", "tezeract" }
+local policeModels = { "police", "police2", "police3", "police4", "policeb", "fbi", "fbi2" }
+local processedVehicles = {}
+
+-- 1. Controle de Procurado e Densidade Base
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
-        local ped = PlayerPedId()
         local player = PlayerId()
 
-        -- 1. Remover Nvel de Procurado (Sempre 0 estrelas)
+        -- Remover Nvel de Procurado
         if GetPlayerWantedLevel(player) ~= 0 then
             ClearPlayerWantedLevel(player)
             SetMaxWantedLevel(0)
         end
 
-        -- 2. Controle de Densidade (50% de Civis, Mantendo Emergncia)
-        -- Trfego Geral
+        -- Densidade Geral (Reduzida para dar espao aos Supercarros e Polcia)
         SetVehicleDensityMultiplierThisFrame(0.5)
-        SetRandomVehicleDensityMultiplierThisFrame(0.5)
-        SetParkedVehicleDensityMultiplierThisFrame(0.3)
-        
-        -- Pedestres Geral
         SetPedDensityMultiplierThisFrame(0.5)
-        SetScenarioPedDensityMultiplierThisFrame(0.5)
-
-        -- Garantir Polcia/Emergncia (Efeito de Patrulha)
+        SetRandomVehicleDensityMultiplierThisFrame(0.5)
+        
+        -- Garantir que a polcia possa spawnar nativamente tambm
         SetCreateRandomCops(true)
         SetCreateRandomCopsOnScenarios(true)
         SetCreateRandomCopsNotOnScenarios(true)
-        SetDispatchCopsForPlayer(player, false) -- Impede que eles te persigam sem motivo
+        SetDispatchCopsForPlayer(player, false)
+    end
+end)
+
+-- 2. Substituio de Trfego (Comuns -> Supercarros)
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(2000)
+        local ped = PlayerPedId()
+        local coords = GetEntityCoords(ped)
+        local vehicles = GetGamePool('CVehicle')
+
+        for _, veh in ipairs(vehicles) do
+            if DoesEntityExist(veh) and not processedVehicles[veh] then
+                local class = GetVehicleClass(veh)
+                
+                -- Se for um carro comum (não emergência, não supercarro prévio)
+                if class ~= 18 and class ~= 19 and class ~= 15 and not IsPedAPlayer(GetPedInVehicleSeat(veh, -1)) then
+                    local randomSuper = supercars[math.random(#supercars)]
+                    local hash = GetHashKey(randomSuper)
+
+                    if #(coords - GetEntityCoords(veh)) > 40.0 and #(coords - GetEntityCoords(veh)) < 150.0 then
+                        RequestModel(hash)
+                        while not HasModelLoaded(hash) do Wait(0) end
+
+                        local pos = GetEntityCoords(veh)
+                        local heading = GetEntityHeading(veh)
+                        local newVeh = CreateVehicle(hash, pos.x, pos.y, pos.z, heading, true, false)
+                        
+                        local driver = GetPedInVehicleSeat(veh, -1)
+                        if DoesEntityExist(driver) then
+                            SetPedIntoVehicle(driver, newVeh, -1)
+                            TaskVehicleDriveWander(driver, newVeh, 20.0, 786603)
+                        end
+
+                        DeleteVehicle(veh)
+                        processedVehicles[newVeh] = true
+                    end
+                end
+                processedVehicles[veh] = true
+            end
+        end
+    end
+end)
+
+-- 3. Gerador de Patrulhas Intensas (Garantir 3 viaturas próximas)
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(5000)
+        local ped = PlayerPedId()
+        local coords = GetEntityCoords(ped)
+        local vehicles = GetGamePool('CVehicle')
+        local policeCount = 0
+
+        for _, veh in ipairs(vehicles) do
+            local model = GetEntityModel(veh)
+            for _, pModel in ipairs(policeModels) do
+                if model == GetHashKey(pModel) then
+                    policeCount = policeCount + 1
+                    break
+                end
+            end
+        end
+
+        if policeCount < 3 then
+            local randomPolice = policeModels[math.random(#policeModels)]
+            local hash = GetHashKey(randomPolice)
+            
+            RequestModel(hash)
+            while not HasModelLoaded(hash) do Wait(0) end
+
+            local retval, spawnPos, spawnHeading = GetClosestVehicleNodeWithHeading(coords.x + math.random(-150, 150), coords.y + math.random(-150, 150), coords.z, 1, 3, 0)
+            
+            if retval then
+                local pVeh = CreateVehicle(hash, spawnPos.x, spawnPos.y, spawnPos.z, spawnHeading, true, false)
+                local pPed = CreatePedInsideVehicle(pVeh, 4, GetHashKey("s_m_y_cop_01"), -1, true, false)
+                
+                SetVehicleOnGroundProperly(pVeh)
+                TaskVehicleDriveWander(pPed, pVeh, 15.0, 786603) -- Patrulha
+                SetEntityAsMissionEntity(pVeh, true, true)
+            end
+        end
+    end
+end)
     end
 end)

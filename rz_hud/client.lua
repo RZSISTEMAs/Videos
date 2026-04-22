@@ -8,47 +8,54 @@ local isAssaltoLivre = false
 Citizen.CreateThread(function()
     -- Configurao do Minimapa Moderno (Quadrado)
     SetMinimapClipType(1) 
-    SetRadarBigmapEnabled(true, false)
-    Wait(0)
-    SetRadarBigmapEnabled(false, false)
-
+    
+    -- Loop para esconder o HUD nativo e configurar o radar
     while true do
         Citizen.Wait(0)
         local ped = PlayerPedId()
         local inVehicle = IsPedInAnyVehicle(ped, false)
 
-        -- Mostrar mapa apenas se estiver no carro
+        -- Mostrar/Esconder Radar condicionalmente
         if inVehicle then
             DisplayRadar(true)
+            SetRadarAlpha(180) -- Transparncia do GPS (Waze style)
+            
+            -- Esconder barras de Vida/Colete do mapa nativo (Scaleform)
+            local minimap = RequestScaleformMovie("minimap")
+            if HasScaleformMovieLoaded(minimap) then
+                BeginScaleformMovieMethod(minimap, "SETUP_HEALTH_ARMOUR")
+                ScaleformMovieMethodAddParamInt(3) -- Esconde ambos
+                EndScaleformMovieMethod()
+            end
         else
             DisplayRadar(false)
+            isSeatbeltOn = false -- Reset se sair do carro
         end
         
-        -- Esconde componentes nativos com segurana
-        HideHudComponentThisFrame(3) -- SP_CASH
-        HideHudComponentThisFrame(4) -- MP_CASH
-        HideHudComponentThisFrame(13) -- PL_NAME
-        HideHudComponentThisFrame(7) -- AREA_NAME
-        HideHudComponentThisFrame(9) -- STREET_NAME
+        -- Esconde componentes nativos (Nome do carro, Classe, Rua, etc)
         HideHudComponentThisFrame(6) -- VEHICLE_NAME
         HideHudComponentThisFrame(8) -- VEHICLE_CLASS
-        HideHudComponentThisFrame(2) -- WEAPON_ICON
+        HideHudComponentThisFrame(7) -- AREA_NAME
+        HideHudComponentThisFrame(9) -- STREET_NAME
+        HideHudComponentThisFrame(3) -- CASH
+        HideHudComponentThisFrame(4) -- CASH
+        HideHudComponentThisFrame(2) -- WEAPON
         
         -- Bloquear sada se estiver de cinto
         if isSeatbeltOn then
-            DisableControlAction(0, 75, true) -- Bloqueia o "F" (Sair do Carro)
+            DisableControlAction(0, 75, true) 
         end
 
-        -- Persistncia do Motor Desligado
+        -- Persistncia do Motor Desligado (TOTAL)
         if inVehicle then
             local veh = GetVehiclePedIsIn(ped, false)
             if not engineStatus then
                 SetVehicleEngineOn(veh, false, true, true)
-                SetVehicleEngineCanTick(veh, false) -- NOVO: Impede o motor de processar
-                DisableControlAction(2, 71, true) -- W (Acelerar)
-                DisableControlAction(2, 72, true) -- S (Frear/R)
+                SetVehicleUndriveable(veh, true) -- Trava o carro totalmente
+                DisableControlAction(2, 71, true) 
+                DisableControlAction(2, 72, true) 
             else
-                SetVehicleEngineCanTick(veh, true)
+                SetVehicleUndriveable(veh, false)
             end
         else
             engineStatus = true

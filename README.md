@@ -41,6 +41,7 @@ Whether you are a server owner looking to enhance your Roleplay, or a developer 
   * 🎞️ **[Assista ao Tutorial de Funcionamento no YouTube](https://www.youtube.com/watch?v=NwqZOcAI6Lo)**
 * 🏙️ **[cidade_viva](./cidade_viva/)** - Sistema inovador de destruição persistente onde o mapa só é restaurado se os jogadores consertarem os objetos. (Innovative persistent destruction system).
 * 🛡️ **[painel_p](./painel_p/)** - Menu Admin Premium Standalone com interface moderna, sistema de permissões por ID e ferramentas completas de gestão. (Premium Standalone Admin Menu).
+* 🖥️ **[rz_hud](./rz_hud/)** - Interface (HUD) personalizada com marca d'água 3D orbital, localização em tempo real e sistema de "Assalto Livre". (Custom HUD with 3D orbital branding and location/time info).
 
 <br>
 

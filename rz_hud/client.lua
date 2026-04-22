@@ -2,15 +2,17 @@ local streetName = ""
 local zoneName = ""
 local isAssaltoLivre = false
 
--- Esconder componentes do HUD nativo
+-- Esconder componentes do HUD nativo e o Minimapa
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
-        -- Esconde vida, armas, dinheiro e o minimapa padro se quiser (neste caso, manteremos o radar limpo)
+        -- Esconde vida, armas, dinheiro e o minimapa
+        DisplayRadar(false) -- REMOVE O MINIMAPA
         HideHudComponentThisFrame(3) -- SP_CASH
         HideHudComponentThisFrame(4) -- MP_CASH
         HideHudComponentThisFrame(13) -- PL_NAME
-        -- HideHudComponentThisFrame(2) -- WEAPON_ICON (Opcional)
+        HideHudComponentThisFrame(7) -- AREA_NAME
+        HideHudComponentThisFrame(9) -- STREET_NAME
     end
 end)
 

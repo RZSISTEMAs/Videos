@@ -6,9 +6,11 @@
     <title>RZ HUD - RZSISTEMA</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
 </head>
 <body>
-    <!-- Overlay Central Inovador -->
+    <!-- Overlay Central Inovador (Movido para o Topo) -->
     <div id="central-overlay">
         <h1 id="brand-main">RZSISTEMA</h1>
         <div class="orbit-container">
@@ -16,18 +18,19 @@
         </div>
     </div>
 
-    <!-- Interface Lateral Superior -->
+    <!-- Interface Lateral Superior (Sem fundos pretos, apenas ícones e cores) -->
     <div id="top-right-hud">
-        <div class="info-group">
-            <span class="label">LOCALIZAÇÃO</span>
-            <span id="street-text">Aguardando...</span>
-            <span id="zone-text">Carregando mapa...</span>
-        </div>
-        <div class="info-group">
-            <div class="time-row">
-                <span id="game-time">00:00</span>
-                <div id="assalto-badge" class="hidden">ASSALTO LIBERADO</div>
+        <div class="info-item">
+            <i class="fa-solid fa-location-dot icon-loc"></i>
+            <div class="loc-details">
+                <span id="street-text">...</span>
+                <span id="zone-text">...</span>
             </div>
+        </div>
+        <div class="info-item">
+            <i class="fa-solid fa-clock icon-time"></i>
+            <span id="game-time">00:00</span>
+            <div id="assalto-badge" class="hidden">ASSALTO LIBERADO</div>
         </div>
     </div>
 

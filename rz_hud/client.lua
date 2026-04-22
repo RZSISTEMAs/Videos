@@ -27,9 +27,13 @@ Citizen.CreateThread(function()
         local ped = PlayerPedId()
         if IsPedInAnyVehicle(ped, false) then
             local veh = GetVehiclePedIsIn(ped, false)
-            if not engineStatus and GetIsVehicleEngineRunning(veh) then
+            if not engineStatus then
                 SetVehicleEngineOn(veh, false, true, true)
+                DisableControlAction(2, 71, true) -- W (Acelerar)
+                DisableControlAction(2, 72, true) -- S (Frear/R)
             end
+        else
+            engineStatus = true -- Reseta ao sair para evitar bugs no prximo carro
         end
     end
 end)

@@ -14,10 +14,10 @@ body {
     overflow: hidden;
 }
 
-/* Overlay Central Inovador (AGORA NO TOPO) */
+/* Overlay Central Inovador */
 #central-overlay {
     position: absolute;
-    top: 40px; /* Movido para o topo */
+    top: 40px;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
@@ -63,7 +63,7 @@ body {
     100% { transform: rotateY(360deg) translateZ(120px); opacity: 1; filter: blur(0px); z-index: 10; }
 }
 
-/* HUD Lateral Superior Direito (LIMPO, SEM FUNDO PRETO) */
+/* HUD Lateral Superior Direito */
 #top-right-hud {
     position: absolute;
     top: 30px;
@@ -111,6 +111,84 @@ body {
     font-weight: 800;
     color: #fff;
     text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+/* HUD Inferior Direito (Velocmetro + Status) */
+#bottom-right-hud {
+    position: absolute;
+    bottom: 40px;
+    right: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+}
+
+.speed-container {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+#speed-value {
+    font-size: 60px;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.unit {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ff9d00;
+    text-transform: uppercase;
+}
+
+.status-container {
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.status-icon {
+    font-size: 16px;
+    width: 20px;
+}
+
+.status-icon.health { color: #10b981; }
+.status-icon.armor { color: #3b82f6; }
+
+.bar-bg {
+    flex-grow: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    width: 100%;
+    transition: width 0.3s ease-out;
+    border-radius: 10px;
+}
+
+.bar-fill.health {
+    background: linear-gradient(90deg, #10b981, #34d399);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.bar-fill.armor {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
 }
 
 /* Badge de Assalto */

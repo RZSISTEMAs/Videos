@@ -19,10 +19,10 @@ end)
 -- Loop de informaes (Localizao, Horrio e Status)
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(1000) -- Atualiza a cada 1 segundo para poupar performance
-
         local ped = PlayerPedId()
         local coords = GetEntityCoords(ped)
+        local inVehicle = IsPedInAnyVehicle(ped, false)
+        local waitTime = inVehicle and 100 or 1000 -- Mais rpido se estiver correndo no carro
 
         -- 1. Localizao
         local streetHash, _ = GetStreetNameAtCoord(coords.x, coords.y, coords.z)
@@ -43,13 +43,30 @@ Citizen.CreateThread(function()
             isAssaltoLivre = false
         end
 
+        -- 4. Status e Velocidade
+        local speed = 0
+        if inVehicle then
+            local veh = GetVehiclePedIsIn(ped, false)
+            speed = math.ceil(GetEntitySpeed(veh) * 3.6) -- KM/H
+        end
+
+        local health = GetEntityHealth(ped) - 100
+        if health < 0 then health = 0 end
+        local armor = GetPedArmour(ped)
+
         -- Enviar para a UI
         SendNUIMessage({
             type = "updateHUD",
             street = streetName,
             zone = zoneName,
             time = timeString,
-            assalto = isAssaltoLivre
+            assalto = isAssaltoLivre,
+            speed = speed,
+            inVehicle = inVehicle,
+            health = health,
+            armor = armor
         })
+
+        Citizen.Wait(waitTime)
     end
 end)

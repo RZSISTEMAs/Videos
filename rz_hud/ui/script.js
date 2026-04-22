@@ -16,5 +16,22 @@ window.addEventListener('message', (event) => {
         } else {
             assaltoBadge.classList.add('hidden');
         }
+
+        // Atualizar Velocidade
+        const speedHud = document.getElementById('bottom-right-hud');
+        const speedText = document.getElementById('speed-value');
+        if (data.inVehicle) {
+            speedHud.classList.remove('hidden');
+            speedText.innerText = data.speed;
+        } else {
+            speedHud.classList.add('hidden');
+        }
+
+        // Atualizar Status (Vida e Colete)
+        const healthBar = document.getElementById('health-fill');
+        const armorBar = document.getElementById('armor-fill');
+        
+        healthBar.style.width = data.health + '%';
+        armorBar.style.width = data.armor + '%';
     }
 });

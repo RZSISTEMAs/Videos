@@ -131,3 +131,34 @@ Citizen.CreateThread(function()
         Citizen.Wait(waitTime)
     end
 end)
+
+-- Controle de Ambiente (Procurado e Densidade de NPCs/Trfego)
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(0)
+        local ped = PlayerPedId()
+        local player = PlayerId()
+
+        -- 1. Remover Nvel de Procurado (Sempre 0 estrelas)
+        if GetPlayerWantedLevel(player) ~= 0 then
+            ClearPlayerWantedLevel(player)
+            SetMaxWantedLevel(0)
+        end
+
+        -- 2. Controle de Densidade (50% de Civis, Mantendo Emergncia)
+        -- Trfego Geral
+        SetVehicleDensityMultiplierThisFrame(0.5)
+        SetRandomVehicleDensityMultiplierThisFrame(0.5)
+        SetParkedVehicleDensityMultiplierThisFrame(0.3)
+        
+        -- Pedestres Geral
+        SetPedDensityMultiplierThisFrame(0.5)
+        SetScenarioPedDensityMultiplierThisFrame(0.5)
+
+        -- Garantir Polcia/Emergncia (Efeito de Patrulha)
+        SetCreateRandomCops(true)
+        SetCreateRandomCopsOnScenarios(true)
+        SetCreateRandomCopsNotOnScenarios(true)
+        SetDispatchCopsForPlayer(player, false) -- Impede que eles te persigam sem motivo
+    end
+end)

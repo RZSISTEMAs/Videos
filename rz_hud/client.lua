@@ -1,4 +1,5 @@
 local isSeatbeltOn = false
+local engineStatus = true
 local streetName = ""
 local zoneName = ""
 local isAssaltoLivre = false
@@ -21,6 +22,15 @@ Citizen.CreateThread(function()
         if isSeatbeltOn then
             DisableControlAction(0, 75, true) -- Bloqueia o "F" (Sair do Carro)
         end
+
+        -- Persistncia do Motor Desligado (Impede auto-start pelo 'W')
+        local ped = PlayerPedId()
+        if IsPedInAnyVehicle(ped, false) then
+            local veh = GetVehiclePedIsIn(ped, false)
+            if not engineStatus and GetIsVehicleEngineRunning(veh) then
+                SetVehicleEngineOn(veh, false, true, true)
+            end
+        end
     end
 end)
 
@@ -35,9 +45,9 @@ end)
 
             -- Tecla Z (Motor) - ID 20
             if IsControlJustPressed(0, 20) then
-                local engine = GetIsVehicleEngineRunning(veh)
-                SetVehicleEngineOn(veh, not engine, false, true)
-                local msg = engine and "Motor Desligado" or "Motor Ligado"
+                engineStatus = not engineStatus
+                SetVehicleEngineOn(veh, engineStatus, false, true)
+                local msg = engineStatus and "Motor Ligado" or "Motor Desligado"
                 SendNUIMessage({ type = "notify", message = msg })
             end
 

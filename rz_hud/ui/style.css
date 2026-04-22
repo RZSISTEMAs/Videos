@@ -14,7 +14,7 @@ body {
     overflow: hidden;
 }
 
-/* Overlay Central Inovador */
+/* Overlay Central */
 #central-overlay {
     position: absolute;
     top: 40px;
@@ -63,7 +63,7 @@ body {
     100% { transform: rotateY(360deg) translateZ(120px); opacity: 1; filter: blur(0px); z-index: 10; }
 }
 
-/* HUD Lateral Superior Direito */
+/* HUD Lateral Superior */
 #top-right-hud {
     position: absolute;
     top: 30px;
@@ -78,7 +78,6 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 5px;
 }
 
 .icon-loc { color: #ff9d00; font-size: 24px; text-shadow: 0 0 10px rgba(255, 157, 0, 0.5); }
@@ -101,7 +100,6 @@ body {
 #zone-text {
     font-size: 14px;
     color: rgba(255, 255, 255, 0.6);
-    font-weight: 400;
     text-transform: uppercase;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
@@ -113,7 +111,7 @@ body {
     text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
 }
 
-/* HUD Inferior Direito (Velocmetro + Status) */
+/* HUD Inferior Direito (Organizado: Speed sobre Status) */
 #bottom-right-hud {
     position: absolute;
     bottom: 40px;
@@ -121,54 +119,54 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 5px;
 }
 
-.speed-container {
+#speed-container {
     display: flex;
     align-items: baseline;
     gap: 8px;
-    margin-bottom: 5px;
+    margin-bottom: 5px; /* Espao entre velocidade e barras */
 }
 
 #speed-value {
-    font-size: 60px;
+    font-size: 65px;
     font-weight: 800;
     color: #fff;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    text-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
 }
 
 .unit {
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 800;
     color: #ff9d00;
     text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255, 157, 0, 0.5);
 }
 
 .status-container {
-    width: 250px;
+    width: 260px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .status-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
-.status-icon {
-    font-size: 16px;
-    width: 20px;
+.emoji-icon {
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
 }
-
-.status-icon.health { color: #10b981; }
-.status-icon.armor { color: #3b82f6; }
 
 .bar-bg {
     flex-grow: 1;
-    height: 6px;
+    height: 8px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     overflow: hidden;
@@ -177,18 +175,17 @@ body {
 .bar-fill {
     height: 100%;
     width: 100%;
-    transition: width 0.3s ease-out;
-    border-radius: 10px;
+    transition: width 0.4s ease-out;
 }
 
 .bar-fill.health {
-    background: linear-gradient(90deg, #10b981, #34d399);
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    background: linear-gradient(90deg, #10b981, #059669);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
 }
 
 .bar-fill.armor {
-    background: linear-gradient(90deg, #3b82f6, #60a5fa);
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
 }
 
 /* Badge de Assalto */
@@ -201,12 +198,11 @@ body {
     font-weight: 800;
     box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
     animation: flash 1s infinite;
-    text-transform: uppercase;
 }
 
 .hidden { display: none !important; }
 
 @keyframes flash {
     0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.05); }
+    50% { opacity: 0.7; transform: scale(1.02); }
 }

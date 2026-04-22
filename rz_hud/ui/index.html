@@ -6,11 +6,10 @@
     <title>RZ HUD - RZSISTEMA</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
 </head>
 <body>
-    <!-- Overlay Central Inovador -->
+    <!-- Overlay Central -->
     <div id="central-overlay">
         <h1 id="brand-main">RZSISTEMA</h1>
         <div class="orbit-container">
@@ -18,7 +17,7 @@
         </div>
     </div>
 
-    <!-- Interface Lateral Superior Direita -->
+    <!-- Interface Lateral Superior -->
     <div id="top-right-hud">
         <div class="info-item">
             <i class="fa-solid fa-location-dot icon-loc"></i>
@@ -34,23 +33,24 @@
         </div>
     </div>
 
-    <!-- Novo: HUD Inferior Direito (Velocmetro + Status) -->
-    <div id="bottom-right-hud" class="hidden">
-        <div class="speed-container">
+    <!-- HUD Inferior Direito (Velocmetro ACIMA e Status FIXO) -->
+    <div id="bottom-right-hud">
+        <!-- Velocmetro (Fica acima quando ativo) -->
+        <div id="speed-container" class="hidden">
             <span id="speed-value">0</span>
             <span class="unit">KM/H</span>
         </div>
+
+        <!-- Status Fixos (Sempre visvel) -->
         <div class="status-container">
-            <!-- Barra de Vida -->
             <div class="status-row">
-                <i class="fa-solid fa-heart status-icon health"></i>
+                <span class="emoji-icon">❤️</span>
                 <div class="bar-bg">
                     <div id="health-fill" class="bar-fill health"></div>
                 </div>
             </div>
-            <!-- Barra de Colete -->
             <div class="status-row">
-                <i class="fa-solid fa-shield-halved status-icon armor"></i>
+                <span class="emoji-icon">🦺</span>
                 <div class="bar-bg">
                     <div id="armor-fill" class="bar-fill armor"></div>
                 </div>

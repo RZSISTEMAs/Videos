@@ -18,16 +18,16 @@ window.addEventListener('message', (event) => {
         }
 
         // Atualizar Velocidade
-        const speedHud = document.getElementById('bottom-right-hud');
+        const speedContainer = document.getElementById('speed-container');
         const speedText = document.getElementById('speed-value');
         if (data.inVehicle) {
-            speedHud.classList.remove('hidden');
+            speedContainer.classList.remove('hidden');
             speedText.innerText = data.speed;
         } else {
-            speedHud.classList.add('hidden');
+            speedContainer.classList.add('hidden');
         }
 
-        // Atualizar Status (Vida e Colete)
+        // Atualizar Status (Vida e Colete) - SEMPRE VISÍVEL
         const healthBar = document.getElementById('health-fill');
         const armorBar = document.getElementById('armor-fill');
         

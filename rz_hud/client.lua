@@ -6,10 +6,24 @@ local isAssaltoLivre = false
 
 -- Esconder componentes do HUD nativo e o Minimapa
 Citizen.CreateThread(function()
+    RequestStreamedTextureDict("squareminimap", false)
+    while not HasStreamedTextureDictLoaded("squareminimap") do
+        Wait(100)
+    end
+    AddReplaceTexture("platform:/textures/graphics", "radarmasksm", "squareminimap", "radarmasksm")
+    
+    -- Configurao do Minimapa Moderno (Quadrado)
+    SetMinimapClipType(1) 
+
     while true do
         Citizen.Wait(0)
-        -- Esconde vida, armas, dinheiro, minimapa e NOME DO CARRO
-        DisplayRadar(false) -- REMOVE O MINIMAPA
+        local ped = PlayerPedId()
+        local inVehicle = IsPedInAnyVehicle(ped, false)
+
+        -- Mostrar mapa apenas se estiver no carro
+        DisplayRadar(inVehicle)
+        
+        -- Esconde vida, armas, dinheiro e NOME DO CARRO nativo
         HideHudComponentThisFrame(3) -- SP_CASH
         HideHudComponentThisFrame(4) -- MP_CASH
         HideHudComponentThisFrame(13) -- PL_NAME
@@ -23,9 +37,8 @@ Citizen.CreateThread(function()
             DisableControlAction(0, 75, true) -- Bloqueia o "F" (Sair do Carro)
         end
 
-        -- Persistncia do Motor Desligado (Impede auto-start pelo 'W')
-        local ped = PlayerPedId()
-        if IsPedInAnyVehicle(ped, false) then
+        -- Persistncia do Motor Desligado
+        if inVehicle then
             local veh = GetVehiclePedIsIn(ped, false)
             if not engineStatus then
                 SetVehicleEngineOn(veh, false, true, true)
@@ -33,7 +46,7 @@ Citizen.CreateThread(function()
                 DisableControlAction(2, 72, true) -- S (Frear/R)
             end
         else
-            engineStatus = true -- Reseta ao sair para evitar bugs no prximo carro
+            engineStatus = true
         end
     end
 end)

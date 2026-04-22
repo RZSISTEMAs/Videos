@@ -131,3 +131,15 @@ Citizen.CreateThread(function()
         Citizen.Wait(waitTime)
     end
 end)
+
+-- Limpar Nvel de Procurado (Sempre 0 estrelas)
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(1000)
+        local player = PlayerId()
+        if GetPlayerWantedLevel(player) ~= 0 then
+            ClearPlayerWantedLevel(player)
+            SetMaxWantedLevel(0)
+        end
+    end
+end)

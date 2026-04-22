@@ -58,61 +58,6 @@ body {
     100% { transform: scale(0) rotate(20deg); opacity: 0; }
 }
 
-/* GPS WAZE STYLE (Moldura Inovadora) */
-#gps-waze {
-    position: absolute;
-    bottom: 25px;
-    left: 25px;
-    width: 280px;
-    height: 190px;
-    pointer-events: none;
-}
-
-.gps-bezel {
-    width: 100%;
-    height: 100%;
-    border: 2px solid rgba(51, 153, 255, 0.3);
-    border-radius: 15px;
-    background: rgba(0, 0, 0, 0.1);
-    position: relative;
-    box-shadow: 0 0 30px rgba(51, 153, 255, 0.15);
-}
-
-.gps-line {
-    position: absolute;
-    width: 80px;
-    height: 3px;
-    background: #3399ff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px #3399ff;
-}
-
-.gps-line.top { top: -1px; left: 20px; }
-.gps-line.bottom { bottom: -1px; right: 20px; }
-
-.gps-info {
-    position: absolute;
-    top: -30px;
-    left: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #3399ff;
-    padding: 5px 12px;
-    border-radius: 8px 8px 0 0;
-    font-size: 10px;
-    font-weight: 800;
-    color: #fff;
-}
-
-.waze-icon { font-size: 12px; animation: pulse 2s infinite; }
-
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
-}
-
 /* Overlay Central */
 #central-overlay {
     position: absolute;

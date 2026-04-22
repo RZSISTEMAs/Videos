@@ -17,21 +17,18 @@ window.addEventListener('message', (event) => {
             assaltoBadge.classList.add('hidden');
         }
 
-        // Atualizar Velocidade e GPS
+        // Atualizar Velocidade
         const speedContainer = document.getElementById('speed-container');
         const speedText = document.getElementById('speed-value');
         const seatbeltRow = document.getElementById('seatbelt-row');
-        const gpsWaze = document.getElementById('gps-waze');
 
         if (data.inVehicle) {
             speedContainer.classList.remove('hidden');
             speedText.innerText = data.speed;
             seatbeltRow.classList.remove('hidden'); 
-            gpsWaze.classList.remove('hidden'); // MOSTRA GPS NO CARRO
         } else {
             speedContainer.classList.add('hidden');
             seatbeltRow.classList.add('hidden');
-            gpsWaze.classList.add('hidden'); // ESCONDE GPS FORA DO CARRO
         }
 
         // Atualizar Status (Vida e Colete)

@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
 </head>
 <body>
+    <!-- Notificao Estilo Post-it -->
+    <div id="notify-container"></div>
+
     <!-- Overlay Central -->
     <div id="central-overlay">
         <h1 id="brand-main">RZSISTEMA</h1>
@@ -33,15 +36,15 @@
         </div>
     </div>
 
-    <!-- HUD Inferior Direito (Velocmetro ACIMA e Status FIXO) -->
+    <!-- HUD Inferior Direito -->
     <div id="bottom-right-hud">
-        <!-- Velocmetro (Fica acima quando ativo) -->
+        <!-- Velocmetro -->
         <div id="speed-container" class="hidden">
             <span id="speed-value">0</span>
             <span class="unit">KM/H</span>
         </div>
 
-        <!-- Status Fixos (Sempre visvel) -->
+        <!-- Status Fixos -->
         <div class="status-container">
             <div class="status-row">
                 <span class="emoji-icon">❤️</span>
@@ -54,6 +57,11 @@
                 <div class="bar-bg">
                     <div id="armor-fill" class="bar-fill armor"></div>
                 </div>
+            </div>
+            <!-- Novo: Status do Cinto -->
+            <div id="seatbelt-row" class="status-row hidden">
+                <span id="seatbelt-icon" class="emoji-icon off">🔏</span>
+                <span id="seatbelt-text">CINTO SOLTO</span>
             </div>
         </div>
     </div>

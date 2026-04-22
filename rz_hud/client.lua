@@ -1,3 +1,4 @@
+local isSeatbeltOn = false
 local streetName = ""
 local zoneName = ""
 local isAssaltoLivre = false
@@ -6,13 +7,54 @@ local isAssaltoLivre = false
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
-        -- Esconde vida, armas, dinheiro e o minimapa
+        -- Esconde vida, armas, dinheiro, minimapa e NOME DO CARRO
         DisplayRadar(false) -- REMOVE O MINIMAPA
         HideHudComponentThisFrame(3) -- SP_CASH
         HideHudComponentThisFrame(4) -- MP_CASH
         HideHudComponentThisFrame(13) -- PL_NAME
         HideHudComponentThisFrame(7) -- AREA_NAME
         HideHudComponentThisFrame(9) -- STREET_NAME
+        HideHudComponentThisFrame(6) -- VEHICLE_NAME
+        HideHudComponentThisFrame(8) -- VEHICLE_CLASS
+        
+        -- Bloquear sada se estiver de cinto
+        if isSeatbeltOn then
+            DisableControlAction(0, 75, true) -- Bloqueia o "F" (Sair do Carro)
+        end
+    end
+end)
+
+-- Comandos de Tecla (Motor e Cinto)
+ Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(0)
+        local ped = PlayerPedId()
+        if IsPedInAnyVehicle(ped, false) then
+            local veh = GetVehiclePedIsIn(ped, false)
+            local class = GetVehicleClass(veh)
+
+            -- Tecla Z (Motor) - ID 20
+            if IsControlJustPressed(0, 20) then
+                local engine = GetIsVehicleEngineRunning(veh)
+                SetVehicleEngineOn(veh, not engine, false, true)
+                local msg = engine and "Motor Desligado" or "Motor Ligado"
+                SendNUIMessage({ type = "notify", message = msg })
+            end
+
+            -- Tecla G (Cinto) - ID 47 (Ignorar motos classe 8)
+            if IsControlJustPressed(0, 47) and class ~= 8 then
+                isSeatbeltOn = not isSeatbeltOn
+                local msg = isSeatbeltOn and "Cinto Colocado" or "Cinto Retirado"
+                SendNUIMessage({ type = "notify", message = msg })
+                SendNUIMessage({ type = "updateSeatbelt", status = isSeatbeltOn })
+            end
+        else
+            -- Resetar cinto ao sair do carro
+            if isSeatbeltOn then
+                isSeatbeltOn = false
+                SendNUIMessage({ type = "updateSeatbelt", status = false })
+            end
+        end
     end
 end)
 

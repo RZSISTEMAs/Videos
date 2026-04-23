@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RZ Creator - RZSISTEMA</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
+</head>
+<body>
+    <div id="app" class="hidden">
+        <!-- TELA DE CRIAO -->
+        <div id="creator-view" class="view">
+            <header>
+                <h1>IDENTIDADE</h1>
+                <p>Personalize seu personagem</p>
+            </header>
+
+            <main>
+                <!-- Gnero -->
+                <div class="menu-section">
+                    <label>GÊNERO</label>
+                    <div class="gender-selector">
+                        <button class="active" data-gender="male"><i class="fa-solid fa-mars"></i> MASCULINO</button>
+                        <button data-gender="female"><i class="fa-solid fa-venus"></i> FEMININO</button>
+                    </div>
+                </div>
+
+                <!-- Gentica -->
+                <div class="menu-section">
+                    <label>GENÉTICA</label>
+                    <div class="control-group">
+                        <span>PAI</span>
+                        <input type="range" id="father" min="0" max="45" value="0">
+                    </div>
+                    <div class="control-group">
+                        <span>MÃE</span>
+                        <input type="range" id="mother" min="0" max="45" value="0">
+                    </div>
+                    <div class="control-group">
+                        <span>MISTURA</span>
+                        <input type="range" id="shapeMix" min="0" max="100" value="50">
+                    </div>
+                </div>
+
+                <!-- Aparncia -->
+                <div class="menu-section">
+                    <label>APARÊNCIA</label>
+                    <div class="control-group">
+                        <span>CABELO</span>
+                        <input type="range" id="hair" min="0" max="74" value="0">
+                    </div>
+                    <div class="control-group">
+                        <span>COR CABELO</span>
+                        <input type="range" id="hairColor" min="0" max="63" value="0">
+                    </div>
+                    <div class="control-group">
+                        <span>OLHOS</span>
+                        <input type="range" id="eyes" min="0" max="31" value="0">
+                    </div>
+                </div>
+
+                 <!-- Roupas -->
+                 <div class="menu-section">
+                    <label>VESTIMENTA</label>
+                    <div class="control-group">
+                        <span>CAMISA</span>
+                        <input type="range" id="tops" min="0" max="100" value="15">
+                    </div>
+                    <div class="control-group">
+                        <span>CALÇA</span>
+                        <input type="range" id="legs" min="0" max="100" value="10">
+                    </div>
+                    <div class="control-group">
+                        <span>SAPATO</span>
+                        <input type="range" id="shoes" min="0" max="100" value="1">
+                    </div>
+                </div>
+            </main>
+
+            <footer>
+                <button id="btn-finalize">FINALIZAR <i class="fa-solid fa-check"></i></button>
+            </footer>
+        </div>
+
+        <!-- TELA DE SPAWN -->
+        <div id="spawn-view" class="view hidden">
+            <header>
+                <h1>DESTINO</h1>
+                <p>Escolha por onde quer entrar na cidade</p>
+            </header>
+
+            <div class="spawn-list">
+                <div class="spawn-card" data-loc="aeroporto">
+                    <i class="fa-solid fa-plane-arrival"></i>
+                    <h2>AEROPORTO</h2>
+                    <span>Inicie sua jornada chegando em Los Santos</span>
+                </div>
+                <div class="spawn-card" data-loc="hospital">
+                    <i class="fa-solid fa-hospital"></i>
+                    <h2>HOSPITAL</h2>
+                    <span>Comece pelo centro médico da cidade</span>
+                </div>
+                <div class="spawn-card" data-loc="praca">
+                    <i class="fa-solid fa-tree"></i>
+                    <h2>PRAÇA</h2>
+                    <span>Vá direto para o coração do agito</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

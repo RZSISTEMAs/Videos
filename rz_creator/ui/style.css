@@ -1,0 +1,222 @@
+:root {
+    --primary: #ffc107;
+    --bg: rgba(10, 10, 10, 0.9);
+    --glass: rgba(255, 255, 255, 0.05);
+    --border: rgba(255, 255, 255, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+    outline: none;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    background: transparent;
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.hidden { display: none !important; }
+
+#app {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding-left: 50px;
+}
+
+/* Criador Menu Lateral */
+#creator-view {
+    width: 380px;
+    height: 90%;
+    background: var(--bg);
+    border: 1px solid var(--glass);
+    border-radius: 20px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+}
+
+header h1 {
+    font-size: 28px;
+    color: #fff;
+    letter-spacing: 2px;
+}
+
+header p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 30px;
+}
+
+main {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+main::-webkit-scrollbar { width: 4px; }
+main::-webkit-scrollbar-thumb { background: var(--glass); border-radius: 10px; }
+
+.menu-section {
+    margin-bottom: 25px;
+}
+
+.menu-section label {
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+
+/* Gnero Buttons */
+.gender-selector {
+    display: flex;
+    gap: 10px;
+}
+
+.gender-selector button {
+    flex: 1;
+    height: 45px;
+    background: var(--glass);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.gender-selector button i { font-size: 14px; }
+.gender-selector button.active {
+    background: rgba(255, 193, 7, 0.1);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Brarras de Range */
+.control-group {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.control-group span {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--glass);
+    border-radius: 10px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--primary);
+}
+
+/* Footer & Finalize */
+footer { padding-top: 20px; }
+
+#btn-finalize {
+    width: 100%;
+    height: 50px;
+    background: var(--primary);
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#btn-finalize:hover { transform: scale(1.02); filter: brightness(1.2); }
+
+/* SPAWN VIEW */
+#spawn-view {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-left: 0;
+    background: rgba(0,0,0,0.6);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#spawn-view header { text-align: center; margin-bottom: 50px; }
+
+.spawn-list {
+    display: flex;
+    gap: 30px;
+}
+
+.spawn-card {
+    width: 280px;
+    height: 380px;
+    background: var(--bg);
+    border: 1px solid var(--glass);
+    border-radius: 24px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.spawn-card i {
+    font-size: 60px;
+    color: var(--primary);
+    margin-bottom: 30px;
+}
+
+.spawn-card h2 {
+    font-size: 24px;
+    color: #fff;
+    margin-bottom: 15px;
+}
+
+.spawn-card span {
+    font-size: 14px;
+    color: rgba(255,255,255,0.4);
+}
+
+.spawn-card:hover {
+    transform: translateY(-20px);
+    border-color: var(--primary);
+    box-shadow: 0 20px 40px rgba(255, 193, 7, 0.1);
+}

@@ -3,127 +3,124 @@ local engineStatus = true
 local streetName = ""
 local zoneName = ""
 local isAssaltoLivre = false
+local playerInVehicle = false
+local currentVehicle = 0
 
--- Esconder componentes do HUD nativo e o Minimapa (Sempre OFF a pedido do usuário)
+-- 1. Thread de Estado (Otimizao: roda a cada 500ms)
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(0)
         local ped = PlayerPedId()
-        local inVehicle = IsPedInAnyVehicle(ped, false)
-
-        DisplayRadar(false) -- MAPA SEMPRE DESATIVADO
-
-        -- Esconde componentes nativos de forma agressiva (Nome do carro, Classe, etc)
-        HideHudComponentThisFrame(6)  -- VEHICLE_NAME
-        HideHudComponentThisFrame(7)  -- AREA_NAME
-        HideHudComponentThisFrame(8)  -- VEHICLE_CLASS
-        HideHudComponentThisFrame(9)  -- STREET_NAME
-        HideHudComponentThisFrame(3)  -- CASH
-        HideHudComponentThisFrame(4)  -- CASH
-        HideHudComponentThisFrame(13) -- PLAYER_NAME
-        HideHudComponentThisFrame(2)  -- WEAPON_ICON
-
-        -- Bloquear saída se estiver de cinto
-        if isSeatbeltOn then
-            DisableControlAction(0, 75, true) 
-        end
-
-        -- Persistência do Motor Desligado (Sem travar rodas)
-        if inVehicle then
-            local veh = GetVehiclePedIsIn(ped, false)
-            if not engineStatus then
-                SetVehicleEngineOn(veh, false, true, true)
-                -- Em vez de Undriveable, desativamos apenas a aceleração/ré
-                DisableControlAction(2, 71, true) -- W
-                DisableControlAction(2, 72, true) -- S
-            end
+        playerInVehicle = IsPedInAnyVehicle(ped, false)
+        if playerInVehicle then
+            currentVehicle = GetVehiclePedIsIn(ped, false)
         else
-            engineStatus = true
-        end
-    end
-end)
-
--- Comandos de Tecla (Motor e Cinto)
- Citizen.CreateThread(function()
-    while true do
-        Citizen.Wait(0)
-        local ped = PlayerPedId()
-        if IsPedInAnyVehicle(ped, false) then
-            local veh = GetVehiclePedIsIn(ped, false)
-            local class = GetVehicleClass(veh)
-
-            -- Tecla Z (Motor) - ID 20
-            if IsControlJustPressed(0, 20) then
-                engineStatus = not engineStatus
-                SetVehicleEngineOn(veh, engineStatus, false, true)
-                local msg = engineStatus and "Motor Ligado" or "Motor Desligado"
-                SendNUIMessage({ type = "notify", message = msg })
-            end
-
-            -- Tecla G (Cinto) - ID 47 (Ignorar motos classe 8)
-            if IsControlJustPressed(0, 47) and class ~= 8 then
-                isSeatbeltOn = not isSeatbeltOn
-                local msg = isSeatbeltOn and "Cinto Colocado" or "Cinto Retirado"
-                SendNUIMessage({ type = "notify", message = msg })
-                SendNUIMessage({ type = "updateSeatbelt", status = isSeatbeltOn })
-            end
-        else
-            -- Resetar cinto ao sair do carro
+            currentVehicle = 0
+            engineStatus = true -- Reseta motor ao sair
             if isSeatbeltOn then
                 isSeatbeltOn = false
                 SendNUIMessage({ type = "updateSeatbelt", status = false })
             end
         end
+        Citizen.Wait(500)
     end
 end)
 
--- Loop de informações (Localização, Horário e Status)
+-- 2. Loop de HUD e Controle Essencial (Wait 0 - apenas o necessrio)
 Citizen.CreateThread(function()
     while true do
-        local ped = PlayerPedId()
-        local coords = GetEntityCoords(ped)
-        local inVehicle = IsPedInAnyVehicle(ped, false)
-        local waitTime = inVehicle and 100 or 1000 -- Mais rápido se estiver correndo no carro
-
-        -- 1. Localização
-        local streetHash, _ = GetStreetNameAtCoord(coords.x, coords.y, coords.z)
-        streetName = GetStreetNameFromHashKey(streetHash)
+        Citizen.Wait(0)
         
-        local zone = GetNameOfZone(coords.x, coords.y, coords.z)
-        zoneName = GetLabelText(zone)
+        DisplayRadar(false) -- Mapa OFF sempre
 
-        -- 2. Horário
-        local hours = GetClockHours()
-        local minutes = GetClockMinutes()
-        local timeString = string.format("%02d:%02d", hours, minutes)
+        -- Ocultao de componentes nativos
+        HideHudComponentThisFrame(6)
+        HideHudComponentThisFrame(7)
+        HideHudComponentThisFrame(8)
+        HideHudComponentThisFrame(9)
+        HideHudComponentThisFrame(3)
+        HideHudComponentThisFrame(4)
+        HideHudComponentThisFrame(13)
+        HideHudComponentThisFrame(2)
 
-        -- 3. Lógica Assalto Livre (00h até as 06h)
-        if hours >= 0 and hours < 6 then
-            isAssaltoLivre = true
-        else
-            isAssaltoLivre = false
+        if playerInVehicle then
+            -- Cinto (Bloqueio de sada)
+            if isSeatbeltOn then
+                DisableControlAction(0, 75, true)
+            end
+
+            -- Motor Desligado (Impede acelerao sem forar nativas de motor no loop 0)
+            if not engineStatus then
+                DisableControlAction(2, 71, true)
+                DisableControlAction(2, 72, true)
+            end
+        end
+    end
+end)
+
+-- 3. Teclas e Ao (Wait 0 - entrada de comando)
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(0)
+        if playerInVehicle and currentVehicle ~= 0 then
+            -- Tecla Z (Motor)
+            if IsControlJustPressed(0, 20) then
+                engineStatus = not engineStatus
+                SetVehicleEngineOn(currentVehicle, engineStatus, false, true)
+                local msg = engineStatus and "Motor Ligado" or "Motor Desligado"
+                SendNUIMessage({ type = "notify", message = msg })
+            end
+
+            -- Tecla G (Cinto) - Ignorar motos classe 8
+            if IsControlJustPressed(0, 47) and GetVehicleClass(currentVehicle) ~= 8 then
+                isSeatbeltOn = not isSeatbeltOn
+                local msg = isSeatbeltOn and "Cinto Colocado" or "Cinto Retirado"
+                SendNUIMessage({ type = "notify", message = msg })
+                SendNUIMessage({ type = "updateSeatbelt", status = isSeatbeltOn })
+            end
+        end
+    end
+end)
+
+-- 4. Loop de UI e Informaes (Otimizado por Importncia)
+Citizen.CreateThread(function()
+    local lastLocUpdate = 0
+    while true do
+        local ped = PlayerPedId()
+        local waitTime = playerInVehicle and 150 or 1000
+        local now = GetGameTimer()
+
+        -- Atualizar Localizao apenas a cada 2 segundos
+        if now - lastLocUpdate > 2000 then
+            local coords = GetEntityCoords(ped)
+            local streetHash, _ = GetStreetNameAtCoord(coords.x, coords.y, coords.z)
+            streetName = GetStreetNameFromHashKey(streetHash)
+            zoneName = GetLabelText(GetNameOfZone(coords.x, coords.y, coords.z))
+            
+            local hours = GetClockHours()
+            isAssaltoLivre = (hours >= 0 and hours < 6)
+            lastLocUpdate = now
         end
 
-        -- 4. Status e Velocidade
         local speed = 0
-        if inVehicle then
-            local veh = GetVehiclePedIsIn(ped, false)
-            speed = math.ceil(GetEntitySpeed(veh) * 3.6) -- KM/H
+        if playerInVehicle and currentVehicle ~= 0 then
+            speed = math.ceil(GetEntitySpeed(currentVehicle) * 3.6)
+            -- Forar motor OFF se estiver desativado (apenas aqui para evitar chamar todo frame no loop 0)
+            if not engineStatus and GetIsVehicleEngineRunning(currentVehicle) then
+                SetVehicleEngineOn(currentVehicle, false, true, true)
+            end
         end
 
-        local health = GetEntityHealth(ped) - 100
-        if health < 0 then health = 0 end
+        local health = math.max(0, GetEntityHealth(ped) - 100)
         local armor = GetPedArmour(ped)
 
-        -- Enviar para a UI
         SendNUIMessage({
             type = "updateHUD",
             street = streetName,
             zone = zoneName,
-            time = timeString,
+            time = string.format("%02d:%02d", GetClockHours(), GetClockMinutes()),
             assalto = isAssaltoLivre,
             speed = speed,
-            inVehicle = inVehicle,
+            inVehicle = playerInVehicle,
             health = health,
             armor = armor
         })

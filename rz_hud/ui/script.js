@@ -1,42 +1,80 @@
+let lastValues = {
+    street: '',
+    zone: '',
+    time: '',
+    assalto: null,
+    speed: null,
+    inVehicle: null,
+    health: null,
+    armor: null
+};
+
 window.addEventListener('message', (event) => {
     let data = event.data;
 
     if (data.type === 'updateHUD') {
-        // Atualizar Localizao
-        document.getElementById('street-text').innerText = data.street || 'DESCONHECIDO';
-        document.getElementById('zone-text').innerText = data.zone || 'CALIFÓRNIA';
+        const hudUpdate = () => {
+            // Atualizar Localizao (Apenas se mudar)
+            if (data.street !== lastValues.street) {
+                document.getElementById('street-text').innerText = data.street || 'DESCONHECIDO';
+                lastValues.street = data.street;
+            }
+            if (data.zone !== lastValues.zone) {
+                document.getElementById('zone-text').innerText = data.zone || 'CALIFÓRNIA';
+                lastValues.zone = data.zone;
+            }
 
-        // Atualizar Horrio
-        document.getElementById('game-time').innerText = data.time;
+            // Atualizar Horrio
+            if (data.time !== lastValues.time) {
+                document.getElementById('game-time').innerText = data.time;
+                lastValues.time = data.time;
+            }
 
-        // Atualizar Badge de Assalto
-        const assaltoBadge = document.getElementById('assalto-badge');
-        if (data.assalto) {
-            assaltoBadge.classList.remove('hidden');
-        } else {
-            assaltoBadge.classList.add('hidden');
-        }
+            // Atualizar Badge de Assalto
+            if (data.assalto !== lastValues.assalto) {
+                const assaltoBadge = document.getElementById('assalto-badge');
+                if (data.assalto) {
+                    assaltoBadge.classList.remove('hidden');
+                } else {
+                    assaltoBadge.classList.add('hidden');
+                }
+                lastValues.assalto = data.assalto;
+            }
 
-        // Atualizar Velocidade
-        const speedContainer = document.getElementById('speed-container');
-        const speedText = document.getElementById('speed-value');
-        const seatbeltRow = document.getElementById('seatbelt-row');
+            // Atualizar Estado de Veculo
+            if (data.inVehicle !== lastValues.inVehicle) {
+                const speedContainer = document.getElementById('speed-container');
+                const seatbeltRow = document.getElementById('seatbelt-row');
+                
+                if (data.inVehicle) {
+                    speedContainer.classList.remove('hidden');
+                    seatbeltRow.classList.remove('hidden');
+                } else {
+                    speedContainer.classList.add('hidden');
+                    seatbeltRow.classList.add('hidden');
+                }
+                lastValues.inVehicle = data.inVehicle;
+            }
 
-        if (data.inVehicle) {
-            speedContainer.classList.remove('hidden');
-            speedText.innerText = data.speed;
-            seatbeltRow.classList.remove('hidden'); 
-        } else {
-            speedContainer.classList.add('hidden');
-            seatbeltRow.classList.add('hidden');
-        }
+            // Atualizar Velocidade
+            if (data.inVehicle && data.speed !== lastValues.speed) {
+                document.getElementById('speed-value').innerText = data.speed;
+                lastValues.speed = data.speed;
+            }
 
-        // Atualizar Status (Vida e Colete)
-        const healthBar = document.getElementById('health-fill');
-        const armorBar = document.getElementById('armor-fill');
-        
-        healthBar.style.width = data.health + '%';
-        armorBar.style.width = data.armor + '%';
+            // Atualizar Status (Vida e Colete)
+            if (data.health !== lastValues.health) {
+                document.getElementById('health-fill').style.width = data.health + '%';
+                lastValues.health = data.health;
+            }
+            if (data.armor !== lastValues.armor) {
+                document.getElementById('armor-fill').style.width = data.armor + '%';
+                lastValues.armor = data.armor;
+            }
+        };
+
+        // Executar com requestAnimationFrame para sincronizar com o browser
+        requestAnimationFrame(hudUpdate);
     }
 
     if (data.type === 'updateSeatbelt') {
@@ -70,11 +108,10 @@ function showPostIt(message) {
 
     container.appendChild(postIt);
 
-    // Remover aps 3 segundos
     setTimeout(() => {
         postIt.classList.add('out');
         setTimeout(() => {
             postIt.remove();
-        }, 500);
+        }, 400);
     }, 3000);
 }

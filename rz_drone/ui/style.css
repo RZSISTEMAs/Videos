@@ -1,0 +1,70 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    background: transparent;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.hidden { display: none; }
+
+#drone-hud {
+    position: absolute;
+    bottom: 50px;
+    left: 40px;
+    background: rgba(10, 10, 10, 0.7);
+    border-left: 4px solid #ffc107;
+    padding: 20px;
+    border-radius: 4px 15px 15px 4px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-50px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.header {
+    color: #ffc107;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
+.controls-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.control-item {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.key {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: 5px;
+    color: #ffc107;
+    font-weight: 800;
+    font-size: 12px;
+}
+
+.control-item.danger .key {
+    color: #f44336;
+}

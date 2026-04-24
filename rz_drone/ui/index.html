@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone HUD</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="drone-hud" class="hidden">
+        <div class="header">DRONE MODE ACTIVE</div>
+        <div class="controls-list">
+            <div class="control-item"><span class="key">W / S</span> MOVER FRENTE / TRÁS</div>
+            <div class="control-item"><span class="key">A / D</span> MOVER LADOS</div>
+            <div class="control-item"><span class="key">Q / E</span> SUBIR / DESCER</div>
+            <div class="control-item"><span class="key">MOUSE</span> ROTACIONAR</div>
+            <div class="control-item danger"><span class="key">F</span> DESATIVAR DRONE</div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'showHUD') {
+                const hud = document.getElementById('drone-hud');
+                if (event.data.status) {
+                    hud.classList.remove('hidden');
+                } else {
+                    hud.classList.add('hidden');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
